@@ -1,0 +1,1080 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sam Chu | Senior CT Radiographer</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  
+  <style>
+    /* === Design System: Refined Elegant Theme === */
+    :root {
+      /* Base - warm, sophisticated neutrals */
+      --bg-primary: oklch(0.985 0.015 50);
+      --bg-secondary: oklch(0.96 0.02 50);
+      --bg-tertiary: oklch(0.92 0.025 50);
+      
+      /* Text - warm grays */
+      --text-primary: oklch(0.22 0.02 50);
+      --text-secondary: oklch(0.42 0.025 50);
+      --text-muted: oklch(0.6 0.02 50);
+      
+      /* Accent - refined amber/copper (not cheap yellow) */
+      --accent-primary: oklch(0.55 0.15 45);
+      --accent-light: oklch(0.75 0.12 45);
+      --accent-foreground: oklch(0.99 0 0);
+      
+      /* Subtle complement - warm taupe */
+      --accent-warm: oklch(0.6 0.08 35);
+      
+      /* Prestige accent - gold for company emphasis */
+      --prestige-gold: oklch(0.6 0.15 55);
+      --prestige-gold-light: oklch(0.85 0.1 55);
+      
+      /* Healthcare sector colors */
+      --govt-healthcare: oklch(0.55 0.12 220); /* Government/Public - sophisticated blue */
+      --private-healthcare: oklch(0.55 0.12 320); /* Private - sophisticated purple */
+      --startup-healthcare: oklch(0.55 0.12 160); /* Startup - sophisticated green */
+      
+      /* Borders */
+      --border: oklch(0.88 0.015 50);
+      --border-light: oklch(0.94 0.01 50);
+      
+      /* Typography */
+      --font-sans: 'Outfit', system-ui, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      
+      /* Spacing */
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    *, *::before, *::after {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-sans);
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* === Hero Section - Elegant Minimal === */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 2rem;
+      background: linear-gradient(165deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, oklch(0.95 0.03 45) 100%);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, oklch(0.9 0.08 45 / 0.3) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero::after {
+      content: '';
+      position: absolute;
+      bottom: -30%;
+      left: -10%;
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, oklch(0.85 0.06 30 / 0.25) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      animation: fadeInUp 1s ease-out;
+    }
+
+    .hero-eyebrow {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      margin-bottom: 1.5rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.15s forwards;
+    }
+
+    .hero-name {
+      font-size: clamp(2.75rem, 7vw, 4.5rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 0.75rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.25s forwards;
+    }
+
+    .hero-title {
+      font-size: clamp(1.15rem, 2vw, 1.4rem);
+      font-weight: 400;
+      color: var(--text-secondary);
+      margin-bottom: 1.25rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.35s forwards;
+    }
+
+    .hero-divider {
+      width: 40px;
+      height: 2px;
+      background: var(--accent-primary);
+      margin: 0 auto 1.25rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.45s forwards;
+    }
+
+    .hero-tagline {
+      font-size: 1rem;
+      color: var(--text-muted);
+      max-width: 480px;
+      margin: 0 auto 2.5rem;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.55s forwards;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 2rem;
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.65s forwards;
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.15);
+    }
+
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--text-muted);
+      animation: fadeInUp 1s ease-out 0.85s forwards, float 3s ease-in-out infinite 1.2s;
+      opacity: 0;
+    }
+
+    /* === Section Base === */
+    section {
+      padding: 5rem 2rem;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+
+    .section-header {
+      margin-bottom: 2.5rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.5rem, 3.5vw, 1.85rem);
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      color: var(--text-primary);
+    }
+
+    .section-title i {
+      color: var(--accent-primary);
+    }
+
+    .section-line {
+      width: 32px;
+      height: 2px;
+      background: var(--accent-primary);
+      margin-top: 0.75rem;
+    }
+
+    /* === About === */
+    .about-content {
+      background: var(--bg-secondary);
+      padding: 2.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+    }
+
+    .about-content p {
+      color: var(--text-secondary);
+      font-size: 1.05rem;
+      line-height: 1.8;
+    }
+
+    .about-content p + p {
+      margin-top: 1.25rem;
+    }
+
+    .about-content em {
+      color: var(--text-primary);
+      font-style: normal;
+      font-weight: 500;
+    }
+
+    /* === Skills === */
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1rem;
+    }
+
+    .skill-card {
+      background: var(--bg-secondary);
+      padding: 1.5rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .skill-card:hover {
+      border-color: var(--accent-light);
+      transform: translateY(-2px);
+    }
+
+    .skill-card h4 {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent-primary);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .skill-card h4 i {
+      width: 16px;
+      height: 16px;
+    }
+
+    .skill-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.4rem;
+    }
+
+    .skill-tag {
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 450;
+    }
+
+    /* === Experience Timeline === */
+    .timeline {
+      position: relative;
+      padding-left: 2rem;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 8px;
+      bottom: 8px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent-primary), var(--border));
+    }
+
+    .timeline-item {
+      position: relative;
+      padding-bottom: 2.25rem;
+      padding-left: 1.5rem;
+    }
+
+    .timeline-item::before {
+      content: '';
+      position: absolute;
+      left: -2rem;
+      top: 6px;
+      width: 8px;
+      height: 8px;
+      background: var(--bg-primary);
+      border: 2px solid var(--accent-primary);
+      border-radius: 50%;
+      transform: translateX(-3.5px);
+    }
+
+    .timeline-item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline-date {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent-primary);
+      font-family: var(--font-mono);
+      margin-bottom: 0.35rem;
+      letter-spacing: 0.02em;
+    }
+
+    .timeline-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.2rem;
+      color: var(--text-primary);
+    }
+
+    /* === ENHANCED: Institution Name Prominence === */
+    .timeline-company-row {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.65rem;
+      flex-wrap: wrap;
+    }
+
+    .timeline-company {
+      font-size: 1.2rem; /* Increased from 1.05rem */
+      font-weight: 800; /* Increased from 700 */
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .timeline-company i {
+      width: 18px; /* Increased from 16px */
+      height: 18px; /* Increased from 16px */
+    }
+
+    /* Company badges with sector-specific colors */
+    .company-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.7rem; /* Slightly increased */
+      font-weight: 700; /* Increased from 600 */
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.6rem; /* Increased padding */
+      border-radius: 4px;
+    }
+
+    .company-badge.government {
+      background: var(--govt-healthcare-light, oklch(0.85 0.08 220));
+      color: oklch(0.35 0.1 220);
+    }
+
+    .company-badge.private {
+      background: var(--private-healthcare-light, oklch(0.85 0.08 320));
+      color: oklch(0.35 0.1 320);
+    }
+
+    .company-badge.startup {
+      background: var(--startup-healthcare-light, oklch(0.85 0.08 160));
+      color: oklch(0.35 0.1 160);
+    }
+
+    .company-badge.founding {
+      background: oklch(0.85 0.12 160);
+      color: oklch(0.35 0.1 160);
+    }
+
+    .company-badge.leading {
+      background: oklch(0.85 0.1 55);
+      color: oklch(0.35 0.1 45);
+    }
+
+    /* Enhanced institution name styling - make them more prominent */
+    .institution-name {
+      font-weight: 800; /* Maximum weight for prominence */
+      letter-spacing: -0.01em;
+    }
+
+    /* Contextual descriptions for institutions */
+    .institution-context {
+      font-size: 0.85rem; /* Slightly increased */
+      font-weight: 500;
+      margin-top: 0.3rem; /* Increased spacing */
+      display: block;
+    }
+
+    .institution-context.govt {
+      color: var(--govt-healthcare);
+    }
+
+    .institution-context.private {
+      color: var(--private-healthcare);
+    }
+
+    .institution-context.startup {
+      color: var(--startup-healthcare);
+    }
+
+    .timeline-desc {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+
+    .timeline-desc li {
+      margin-bottom: 0.3rem;
+      padding-left: 0.4rem;
+      line-height: 1.6;
+    }
+
+    /* === Projects === */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .project-card {
+      background: var(--bg-secondary);
+      padding: 1.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+      transition: all 0.3s ease;
+    }
+
+    .project-card:hover {
+      border-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+    }
+
+    .project-icon {
+      width: 42px;
+      height: 42px;
+      background: linear-gradient(135deg, var(--accent-primary), oklch(0.6 0.12 45));
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      color: var(--accent-foreground);
+    }
+
+    .project-title {
+      font-size: 1.05rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text-primary);
+    }
+
+    .project-desc {
+      font-size: 0.875rem;
+      color: var(--text-muted);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.35rem;
+    }
+
+    .project-tag {
+      font-size: 0.7rem;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+      padding: 0.25rem 0.55rem;
+      border-radius: 4px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* === Education === */
+    .education-card {
+      background: var(--bg-secondary);
+      padding: 1.75rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-light);
+    }
+
+    .education-school {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+      color: var(--text-primary);
+    }
+
+    .education-degree {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    .education-period {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .education-honor {
+      margin-top: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--accent-primary);
+      font-weight: 500;
+      background: oklch(0.96 0.04 45);
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+    }
+
+    /* === Languages === */
+    .languages {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+    }
+
+    .language-item {
+      background: var(--bg-secondary);
+      padding: 0.65rem 1rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+    }
+
+    .language-item i {
+      color: var(--accent-warm);
+      width: 16px;
+      height: 16px;
+    }
+
+    /* === Contact === */
+    .contact-section {
+      text-align: center;
+      padding: 5rem 2rem;
+      background: var(--bg-secondary);
+      margin-top: 2rem;
+    }
+
+    .contact-section h2 {
+      font-size: clamp(1.75rem, 4vw, 2.25rem);
+      font-weight: 600;
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-section > p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      max-width: 440px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .contact-links {
+      display: flex;
+      justify-center: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      padding: 0.7rem 1.35rem;
+      background: var(--bg-primary);
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 500;
+      font-size: 0.85rem;
+      transition: all 0.25s ease;
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent-primary);
+      color: var(--accent-primary);
+      transform: translateY(-1px);
+    }
+
+    /* === Footer === */
+    footer {
+      text-align: center;
+      padding: 2rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      background: var(--bg-secondary);
+      border-top: 1px solid var(--border-light);
+    }
+
+    /* === Animations === */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50% { transform: translateX(-50%) translateY(-6px); }
+    }
+
+    /* === Enhanced Visual Polish === */
+    /* Improved focus states for accessibility */
+    .contact-link:focus,
+    .skill-card:focus,
+    .project-card:focus,
+    .hero-cta:focus {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+
+    /* Enhanced hover effects */
+    .skill-card:hover,
+    .project-card:hover,
+    .education-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    }
+
+    /* Improved typography hierarchy */
+    .timeline-company .institution-name {
+      display: block;
+      font-size: 1.25rem; /* Even larger for institution names */
+    }
+
+    /* Enhanced spacing and readability */
+    .timeline-item {
+      margin-bottom: 1.5rem; /* Consistent spacing */
+    }
+
+    /* === Responsive === */
+    @media (max-width: 768px) {
+      section { padding: 3.5rem 1.25rem; }
+      .timeline { padding-left: 1.25rem; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .hero { min-height: 90vh; }
+      .about-content { padding: 1.75rem; }
+      .timeline-company-row { gap: 0.35rem; }
+      
+      /* Mobile-specific enhancements */
+      .timeline-company {
+        font-size: 1.1rem;
+      }
+      
+      .timeline-company .institution-name {
+        font-size: 1.15rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .timeline-company {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.25rem;
+      }
+      
+      .company-badge {
+        margin-top: 0.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-content">
+      <p class="hero-eyebrow">Senior CT Radiographer</p>
+      <h1 class="hero-name">Sam Chu</h1>
+      <p class="hero-title">Transforming Diagnostic Imaging</p>
+      <div class="hero-divider"></div>
+      <p class="hero-tagline">From setup to scan — 11+ years of clinical excellence across world-class hospitals and innovative healthcare startups.</p>
+      <a href="#about" class="hero-cta">
+        <span>Explore My Work</span>
+        <i data-lucide="arrow-down" width="16" height="16"></i>
+      </a>
+    </div>
+    
+    <div class="scroll-indicator">
+      <i data-lucide="chevron-down" width="22" height="22"></i>
+    </div>
+  </section>
+
+  <!-- About Section -->
+  <section id="about">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="user" width="20" height="20"></i>
+        About Me
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="about-content">
+      <p>With over 11 years of experience spanning world-class public hospitals, premium private facilities, and cutting-edge wellness startups, I've dedicated my career to mastering the art and science of diagnostic imaging.</p>
+      <p>What sets me apart isn't just technical expertise — it's the ability to see the bigger picture. My strong foundation in <em>radiation physics</em> and <em>human physiology</em> means I don't just follow protocols; I understand <em>why</em> each decision matters. This allows me to optimize every scan for the perfect balance of diagnostic quality and patient safety.</p>
+      <p>I've been fortunate to be part of three founding teams launching new imaging services from the ground up — navigating licensing, building workflows, and configuring systems that set the standard for operational excellence. I'm always eager to bring that same energy to new challenges.</p>
+    </div>
+  </section>
+
+  <!-- Skills Section -->
+  <section id="skills">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="wrench" width="20" height="20"></i>
+        Skills & Expertise
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="skills-grid">
+      <div class="skill-card">
+        <h4><i data-lucide="stethoscope" width="16" height="16"></i> Clinical Excellence</h4>
+        <div class="skill-tags">
+          <span class="skill-tag">CT Imaging</span>
+          <span class="skill-tag">General Radiography</span>
+          <span class="skill-tag">CTCA Workflow</span>
+          <span class="skill-tag">Protocol Optimization</span>
+          <span class="skill-tag">Dose Monitoring</span>
+          <span class="skill-tag">Quality Assurance</span>
+          <span class="skill-tag">COROS / Split-Bolus</span>
+          <span class="skill-tag">CTDI Dosage</span>
+        </div>
+      </div>
+      
+      <div class="skill-card">
+        <h4><i data-lucide="server" width="16" height="16"></i> Technical & Infrastructure</h4>
+        <div class="skill-tags">
+          <span class="skill-tag">AI Tools Integration</span>
+          <span class="skill-tag">PACS Setup</span>
+          <span class="skill-tag">Teleradiology</span>
+          <span class="skill-tag">Equipment Installation</span>
+          <span class="skill-tag">Protocol Design</span>
+          <span class="skill-tag">Cloud Storage</span>
+        </div>
+      </div>
+      
+      <div class="skill-card">
+        <h4><i data-lucide="building-2" width="16" height="16"></i> Healthcare Operations</h4>
+        <div class="skill-tags">
+          <span class="skill-tag">MOH / HCSA Compliance</span>
+          <span class="skill-tag">Clinical Setup</span>
+          <span class="skill-tag">Operational Excellence</span>
+          <span class="skill-tag">Licensing Applications</span>
+          <span class="skill-tag">Workflow Design</span>
+          <span class="skill-tag">Team Leadership</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Experience Section -->
+  <section id="experience">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="briefcase" width="20" height="20"></i>
+        Experience
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-date">Nov 2025 — Present</div>
+        <h3 class="timeline-title">Radiographer / Section Leader</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="building-2" width="16" height="16"></i>
+            <span class="institution-name">MORROW MEDICAL by Seveno Capital</span>
+          </div>
+          <span class="company-badge founding">Founding Team</span>
+        </div>
+        <div class="institution-context startup">Innovative healthcare delivery models</div>
+        <ul class="timeline-desc">
+          <li>Lead radiographer for operational setup of imaging service within a premium longevity and wellness flagship</li>
+          <li>Spearheaded vendor evaluation and technical setup of radiological licensing</li>
+          <li>Hardware/software installation, cloud-based PACS storage and teleradiology service network configuration</li>
+        </ul>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-date">Nov 2023 — Feb 2025</div>
+        <h3 class="timeline-title">Senior Radiographer / MOH CT Section Leader</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="building-2" width="16" height="16"></i>
+            <span class="institution-name">DA Medsuites Orchard by Doctor Anywhere</span>
+          </div>
+          <span class="company-badge founding">Founding Team</span>
+        </div>
+        <div class="institution-context startup">Innovative healthcare delivery models</div>
+        <ul class="timeline-desc">
+          <li>Joined multi-services start-up during imaging services establishment phase</li>
+          <li>Prepared radiological license application, wrote and completed CT QA manual</li>
+          <li>Hardware/software integration and workflow planning for operation launch</li>
+          <li>Section leader for CT, daily operation for X-ray, DEXA, CT scans</li>
+        </ul>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-date">April 2022 — Feb 2023</div>
+        <h3 class="timeline-title">Senior Radiographer / MOH CT Section Leader</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="building-2" width="16" height="16"></i>
+            <span class="institution-name">Early Medical Centre by MiRXES</span>
+          </div>
+          <span class="company-badge founding">Founding Team</span>
+        </div>
+        <div class="institution-context startup">Innovative healthcare delivery models</div>
+        <ul class="timeline-desc">
+          <li>Independently set up imaging services for health screening start-up</li>
+          <li>Oversaw planning, radiological licensing, QA manuals, hardware/software setup, workflow design, to full operation</li>
+        </ul>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-date">Jan 2018 — Mar 2022</div>
+        <h3 class="timeline-title">Radiographer</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="hospital" width="16" height="16"></i>
+            <span class="institution-name">Mount Elizabeth Hospital Orchard</span>
+          </div>
+          <span class="company-badge leading">Leading Hospital</span>
+        </div>
+        <div class="institution-context private">Largest private healthcare group in Singapore</div>
+        <ul class="timeline-desc">
+          <li>Provided General Radiography / CT imaging services across in-patient, out-patient, and emergency departments</li>
+          <li>Imaging guided procedures (CT / Fluoroscopy)</li>
+        </ul>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-date">July 2015 — Oct 2017</div>
+        <h3 class="timeline-title">Radiographer</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="hospital" width="16" height="16"></i>
+            <span class="institution-name">National University Hospital</span>
+          </div>
+          <span class="company-badge leading">Leading Hospital</span>
+        </div>
+        <div class="institution-context govt">Academic medical center with strong research focus</div>
+        <ul class="timeline-desc">
+          <li>Provided General Radiography imaging services across in-patient, out-patient, and emergency departments</li>
+          <li>Led Quality improvement project – To reduce radiation dose for NICU patients with DR system</li>
+        </ul>
+      </div>
+      
+      <div class="timeline-item">
+        <div class="timeline-date">April 2013 — May 2015</div>
+        <h3 class="timeline-title">Radiographer</h3>
+        <div class="timeline-company-row">
+          <div class="timeline-company">
+            <i data-lucide="hospital" width="16" height="16"></i>
+            <span class="institution-name">Singapore General Hospital</span>
+          </div>
+          <span class="company-badge leading">Leading Hospital</span>
+        </div>
+        <div class="institution-context govt">Flagship public hospital known for rigorous training</div>
+        <ul class="timeline-desc">
+          <li>Provided General Radiography imaging services across in-patient, out-patient, and emergency departments</li>
+          <li>Led Quality improvement project – To reduce incorrect potable requests</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- Projects Section -->
+  <section id="projects">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="folder-kanban" width="20" height="20"></i>
+        Projects & Initiatives
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="projects-grid">
+      <div class="project-card">
+        <div class="project-icon">
+          <i data-lucide="shield-check" width="20" height="20"></i>
+        </div>
+        <h3 class="project-title">MOH Radiological Licensing</h3>
+        <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
+        <div class="project-tags">
+          <span class="project-tag">Regulatory</span>
+          <span class="project-tag">Compliance</span>
+          <span class="project-tag">Healthcare</span>
+        </div>
+      </div>
+      
+      <div class="project-card">
+        <div class="project-icon">
+          <i data-lucide="activity" width="20" height="20"></i>
+        </div>
+        <h3 class="project-title">CT Protocol Optimization</h3>
+        <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
+        <div class="project-tags">
+          <span class="project-tag">CT Imaging</span>
+          <span class="project-tag">Dose Reduction</span>
+          <span class="project-tag">Quality</span>
+        </div>
+      </div>
+      
+      <div class="project-card">
+        <div class="project-icon">
+          <i data-lucide="cpu" width="20" height="20"></i>
+        </div>
+        <h3 class="project-title">PACS & Teleradiology Setup</h3>
+        <p class="project-desc">Configureed cloud-based PACS storage solutions and established teleradiology service networks for seamless image transfer and remote reporting capabilities.</p>
+        <div class="project-tags">
+          <span class="project-tag">PACS</span>
+          <span class="project-tag">Cloud</span>
+          <span class="project-tag">Infrastructure</span>
+        </div>
+      </div>
+      
+      <div class="project-card">
+        <div class="project-icon">
+          <i data-lucide="baby" width="20" height="20"></i>
+        </div>
+        <h3 class="project-title">NICU Dose Reduction Initiative</h3>
+        <p class="project-desc">Led quality improvement project at NUH to reduce radiation dose for NICU patients using advanced DR system technology, improving patient safety outcomes.</p>
+        <div class="project-tags">
+          <span class="project-tag">QI Project</span>
+          <span class="project-tag">Pediatric</span>
+          <span class="project-tag">Dose Safety</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Education Section -->
+  <section id="education">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="graduation-cap" width="20" height="20"></i>
+        Education
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="education-card">
+      <div class="education-school">Chung Shan Medical University, Taiwan</div>
+      <div class="education-degree">Bachelor of Science in Medical Imaging & Radiologic Science</div>
+      <div class="education-period">2007 — 2012</div>
+      <div class="education-honor">
+        <i data-lucide="award" width="14" height="14"></i>
+        Highest scorer in National qualifying exam 2012, Taiwan
+      </div>
+    </div>
+  </section>
+
+  <!-- Languages Section -->
+  <section id="languages">
+    <div class="section-header">
+      <h2 class="section-title">
+        <i data-lucide="languages" width="20" height="20"></i>
+        Languages
+      </h2>
+      <div class="section-line"></div>
+    </div>
+    
+    <div class="languages">
+      <div class="language-item">
+        <i data-lucide="globe" width="16" height="16"></i>
+        <span>English</span>
+      </div>
+      <div class="language-item">
+        <i data-lucide="globe" width="16" height="16"></i>
+        <span>Chinese / Mandarin</span>
+      </div>
+      <div class="language-item">
+        <i data-lucide="globe" width="16" height="16"></i>
+        <span>Japanese</span>
+      </div>
+      <div class="language-item">
+        <i data-lucide="globe" width="16" height="16"></i>
+        <span>Hokkien</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="contact-section" id="contact">
+    <h2>Let's Work Together</h2>
+    <p>Whether you're building a new imaging service, need an experienced radiographer, or just want to connect — I'd love to hear from you.</p>
+    <div class="contact-links">
+      <a href="mailto:hello@samchu.dev" class="contact-link">
+        <i data-lucide="mail" width="16" height="16"></i>
+        <span>Get in Touch</span>
+      </a>
+      <a href="https://linkedin.com/in/samchuchu" class="contact-link" target="_blank">
+        <i data-lucide="linkedin" width="16" height="16"></i>
+        <span>LinkedIn</span>
+      </a>
+      <a href="https://github.com/samchuchu" class="contact-link" target="_blank">
+        <i data-lucide="github" width="16" height="16"></i>
+        <span>GitHub</span>
+      </a>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Sam Chu. All rights reserved.</p>
+  </footer>
+
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
