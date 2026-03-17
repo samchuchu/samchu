@@ -52,44 +52,6 @@
       0%, 100% { opacity: 0.4; }
       50% { opacity: 1; }
     }
-
-    /* Click overlay for audio unlock */
-    .click-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 20;
-      cursor: pointer;
-      transition: opacity 0.3s ease;
-    }
-
-    .click-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-    }
-
-    .click-text {
-      font-family: 'Outfit', system-ui, sans-serif;
-      color: #f5f5f5;
-      font-size: 1.2rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      text-align: center;
-      padding: 2rem;
-    }
-
-    .click-text span {
-      display: block;
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
-      opacity: 0.7;
-    }
   </style>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -98,14 +60,6 @@
 <body>
   <div class="loader" id="loader">
     <span class="loader-text">Loading</span>
-  </div>
-
-  <!-- Click overlay to enable audio -->
-  <div class="click-overlay" id="clickOverlay">
-    <div class="click-text">
-      Click to Enter
-      <span>Tap anywhere to start with sound</span>
-    </div>
   </div>
   
   <video id="intro-video" autoplay muted playsinline>
@@ -116,7 +70,6 @@
     const video = document.getElementById('intro-video');
     const videoSource = video.querySelector('source');
     const loader = document.getElementById('loader');
-    const clickOverlay = document.getElementById('clickOverlay');
     
     // Device detection - check if mobile/tablet
     const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
@@ -143,29 +96,6 @@
         loader.style.display = 'none';
       }, 500);
     }, 1000);
-    
-    // Click/tap to enable audio and hide overlay
-    function enableAudio() {
-      video.muted = false;
-      clickOverlay.classList.add('hidden');
-      
-      // Try to play if paused
-      if (video.paused) {
-        video.play().catch(function(e) {
-          console.log('Play failed:', e);
-        });
-      }
-    }
-    
-    clickOverlay.addEventListener('click', enableAudio);
-    clickOverlay.addEventListener('touchstart', enableAudio);
-    
-    // Also allow clicking anywhere on body after initial load
-    document.body.addEventListener('click', function(e) {
-      if (!clickOverlay.classList.contains('hidden')) {
-        enableAudio();
-      }
-    }, { once: true });
     
     // Video ended - redirect to resume
     video.addEventListener('ended', function() {
