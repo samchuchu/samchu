@@ -733,6 +733,13 @@
       opacity: 1;
     }
 
+    /* Protocol documentation images */
+    .protocol-doc {
+      height: 60px;
+      border-radius: 4px;
+      box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+    }
+
     .project-icon {
       width: 42px;
       height: 42px;
@@ -1363,11 +1370,19 @@
         </div>
       </div>
       
-      <div class="project-card">
+      <div class="project-card has-tooltip">
         <div class="project-icon">
           <i data-lucide="activity" width="20" height="20"></i>
         </div>
-        <h3 class="project-title">CT Protocol Optimization</h3>
+        <h3 class="project-title hover-trigger">CT Protocol Optimization</h3>
+        <div class="logo-tooltip protocol-tooltip">
+          <p class="tooltip-text">Protocol Documentation</p>
+          <div class="logo-row">
+            <img src="../resume-backgrounds/others/doc01.png" alt="Protocol Doc 1" class="hospital-logo protocol-doc">
+            <img src="../resume-backgrounds/others/doc02.png" alt="Protocol Doc 2" class="hospital-logo protocol-doc">
+            <img src="../resume-backgrounds/others/doc03.png" alt="Protocol Doc 3" class="hospital-logo protocol-doc">
+          </div>
+        </div>
         <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
         <div class="project-tags">
           <span class="project-tag">CT Imaging</span>
