@@ -597,6 +597,7 @@
     /* === Projects Section - With Background === */
     #projects {
       position: relative;
+      overflow: visible;
     }
 
     #projects::before {
@@ -678,7 +679,7 @@
 
     .logo-tooltip {
       position: absolute;
-      top: calc(100% + 12px);
+      bottom: calc(100% + 12px);
       left: 50%;
       transform: translateX(-50%) translateY(8px);
       background: oklch(0.99 0.01 50 / 0.98);
@@ -698,21 +699,20 @@
     .logo-tooltip::before {
       content: '';
       position: absolute;
-      top: -6px;
+      bottom: -6px;
       left: 50%;
       transform: translateX(-50%) rotate(45deg);
       width: 12px;
       height: 12px;
       background: oklch(0.99 0.01 50 / 0.98);
-      border-left: 1px solid var(--border-light);
-      border-top: 1px solid var(--border-light);
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
     }
 
     .has-tooltip:hover .logo-tooltip {
       opacity: 1;
       visibility: visible;
       transform: translateX(-50%) translateY(0);
-      z-index: 9999;
     }
 
     .tooltip-text {
