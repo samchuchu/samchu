@@ -651,6 +651,88 @@
       box-shadow: 0 8px 24px oklch(0 0 0 / 0.1);
     }
 
+    /* === Logo Tooltip Styles === */
+    .has-tooltip {
+      position: relative;
+    }
+
+    .hover-trigger {
+      display: inline-block;
+      position: relative;
+      cursor: pointer;
+    }
+
+    .hover-trigger:hover {
+      color: var(--accent-primary);
+    }
+
+    .logo-tooltip {
+      position: absolute;
+      top: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%) translateY(8px);
+      background: oklch(0.99 0.01 50 / 0.98);
+      border: 1px solid var(--border-light);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.25rem;
+      min-width: 280px;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 8px 32px oklch(0 0 0 / 0.15);
+      z-index: 100;
+      backdrop-filter: blur(8px);
+    }
+
+    .logo-tooltip::before {
+      content: '';
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: oklch(0.99 0.01 50 / 0.98);
+      border-left: 1px solid var(--border-light);
+      border-top: 1px solid var(--border-light);
+    }
+
+    .has-tooltip:hover .logo-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .tooltip-text {
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--accent-primary);
+      margin-bottom: 0.75rem;
+      text-align: center;
+    }
+
+    .logo-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+    }
+
+    .hospital-logo {
+      height: 32px;
+      width: auto;
+      object-fit: contain;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+
+    .hospital-logo:hover {
+      opacity: 1;
+    }
+
     .project-icon {
       width: 42px;
       height: 42px;
@@ -1260,11 +1342,19 @@
     </div>
     
     <div class="projects-grid">
-      <div class="project-card">
+      <div class="project-card has-tooltip">
         <div class="project-icon">
           <i data-lucide="shield-check" width="20" height="20"></i>
         </div>
-        <h3 class="project-title">MOH Radiological Licensing</h3>
+        <h3 class="project-title hover-trigger">MOH Radiological Licensing</h3>
+        <div class="logo-tooltip">
+          <p class="tooltip-text">Licensed Institutions</p>
+          <div class="logo-row">
+            <img src="../resume-backgrounds/logo/logo-da.png" alt="DA Medsuites" class="hospital-logo">
+            <img src="../resume-backgrounds/logo/logo-early.png" alt="Early Medical Centre" class="hospital-logo">
+            <img src="../resume-backgrounds/logo/logo-morrow.png" alt="MORROW MEDICAL" class="hospital-logo">
+          </div>
+        </div>
         <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
         <div class="project-tags">
           <span class="project-tag">Regulatory</span>
