@@ -643,17 +643,25 @@
       transition: all 0.3s ease;
       backdrop-filter: blur(4px);
       box-shadow: 0 2px 12px oklch(0 0 0 / 0.05);
+      position: relative;
+      z-index: 1;
     }
 
     .project-card:hover {
       border-color: var(--accent-light);
       transform: translateY(-3px);
       box-shadow: 0 8px 24px oklch(0 0 0 / 0.1);
+      z-index: 100;
     }
 
     /* === Logo Tooltip Styles === */
     .has-tooltip {
       position: relative;
+      z-index: 10;
+    }
+
+    .has-tooltip:hover {
+      z-index: 1000;
     }
 
     .hover-trigger {
@@ -681,7 +689,7 @@
       pointer-events: none;
       transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       box-shadow: 0 8px 32px oklch(0 0 0 / 0.15);
-      z-index: 100;
+      z-index: 9999;
       backdrop-filter: blur(8px);
     }
 
@@ -702,6 +710,7 @@
       opacity: 1;
       visibility: visible;
       transform: translateX(-50%) translateY(0);
+      z-index: 9999;
     }
 
     .tooltip-text {
@@ -738,6 +747,10 @@
       height: 60px;
       border-radius: 4px;
       box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+    }
+
+    .protocol-tooltip {
+      z-index: 99999 !important;
     }
 
     .project-icon {
