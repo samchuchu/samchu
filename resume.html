@@ -686,7 +686,8 @@
       border: 1px solid var(--border-light);
       border-radius: var(--radius-sm);
       padding: 1rem 1.25rem;
-      min-width: 280px;
+      min-width: 320px;
+      max-width: 360px;
       opacity: 0;
       visibility: hidden;
       pointer-events: none;
@@ -733,10 +734,11 @@
     }
 
     .hospital-logo {
-      height: 32px;
+      height: 40px;
       width: auto;
+      max-width: 90px;
       object-fit: contain;
-      opacity: 0.85;
+      opacity: 0.9;
       transition: opacity 0.2s ease;
     }
 
@@ -746,9 +748,19 @@
 
     /* Protocol documentation images */
     .protocol-doc {
-      height: 60px;
+      height: 70px;
+      width: auto;
+      max-width: 100px;
+      object-fit: contain;
       border-radius: 4px;
-      box-shadow: 0 2px 8px oklch(0 0 0 / 0.1);
+      box-shadow: 0 2px 8px oklch(0 0 0 / 0.15);
+      background: oklch(0.98 0.01 50);
+      padding: 4px;
+    }
+
+    .protocol-doc:hover {
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px oklch(0 0 0 / 0.2);
     }
 
     .protocol-tooltip {
