@@ -708,6 +708,33 @@
       border-bottom: 1px solid var(--border-light);
     }
 
+    /* Left-positioned tooltip variant */
+    .logo-tooltip-left {
+      left: 0;
+      transform: none;
+      bottom: auto;
+      top: 50%;
+      transform: translateY(-50%);
+      right: calc(100% + 12px);
+      min-width: 280px;
+    }
+
+    .logo-tooltip-left::before {
+      content: '';
+      position: absolute;
+      left: auto;
+      right: -6px;
+      top: 50%;
+      bottom: auto;
+      transform: translateY(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: oklch(0.99 0.01 50 / 0.98);
+      border: none;
+      border-right: 1px solid var(--border-light);
+      border-top: 1px solid var(--border-light);
+    }
+
     .has-tooltip:hover .logo-tooltip {
       opacity: 1;
       visibility: visible;
@@ -1373,7 +1400,7 @@
           <i data-lucide="shield-check" width="20" height="20"></i>
         </div>
         <h3 class="project-title hover-trigger">MOH Radiological Licensing</h3>
-        <div class="logo-tooltip">
+        <div class="logo-tooltip logo-tooltip-left">
           <p class="tooltip-text">Licensed Institutions</p>
           <div class="logo-row">
             <img src="images/logos/logo-da.png" alt="DA Medsuites" class="hospital-logo">
@@ -1394,7 +1421,7 @@
           <i data-lucide="activity" width="20" height="20"></i>
         </div>
         <h3 class="project-title hover-trigger">CT Protocol Optimization</h3>
-        <div class="logo-tooltip protocol-tooltip">
+        <div class="logo-tooltip logo-tooltip-left">
           <p class="tooltip-text">Protocol Documentation</p>
           <div class="logo-row">
             <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="hospital-logo protocol-doc">
@@ -1415,7 +1442,7 @@
           <i data-lucide="cpu" width="20" height="20"></i>
         </div>
         <h3 class="project-title hover-trigger">PACS & Teleradiology Setup</h3>
-        <div class="logo-tooltip">
+        <div class="logo-tooltip logo-tooltip-left">
           <p class="tooltip-text">PACS Systems</p>
           <div class="logo-row">
             <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="hospital-logo">
