@@ -342,6 +342,49 @@
       max-width: 90vw;
       height: auto;
     }
+    /* PACS Logo Hover Effect */
+    .pacs-logo-container {
+      position: relative;
+      width: 200px;
+      height: 80px;
+      cursor: pointer;
+      margin: 20px auto;
+      z-index: 10;
+    }
+    .pacs-logo-container img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      transition: opacity 0.4s ease;
+      border-radius: 8px;
+    }
+    .pacs-logo-default {
+      opacity: 1;
+    }
+    .pacs-logo-hover {
+      opacity: 0;
+    }
+    .pacs-logo-container:hover .pacs-logo-default {
+      opacity: 0;
+    }
+    .pacs-logo-container:hover .pacs-logo-hover {
+      opacity: 1;
+    }
+    .pacs-section {
+      z-index: 10;
+      margin-top: 30px;
+      text-align: center;
+    }
+    .pacs-label {
+      color: #fff;
+      font-size: 14px;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
     @media (max-width: 700px) {
       .content {
         font-size: 1.2rem;
@@ -411,7 +454,7 @@
   </div>
 
   <div class="session" id="session2">
-    <video class="bg-video" src="title-vid/ctroom.mp4" autoplay loop playsinline></video>
+    <video class="bg-video" src="title-vid/ctroom.mp4" autoplay muted loop playsinline></video>
     <div class="content">
       <img
         src="images/aboutme.png"
@@ -422,7 +465,7 @@
   </div>
 
   <div class="session" id="session3">
-    <video class="bg-video" src="title-vid/ctcontrol.mp4" autoplay loop playsinline></video>
+    <video class="bg-video" src="title-vid/ctcontrol.mp4" autoplay muted loop playsinline></video>
     <div class="content">
       <img
         src="images/skills.png"
@@ -433,7 +476,7 @@
   </div>
 
   <div class="session" id="session4">
-    <video class="bg-video" src="title-vid/xrayroom.mp4" autoplay loop playsinline></video>
+    <video class="bg-video" src="title-vid/xrayroom.mp4" autoplay muted loop playsinline></video>
     <div class="content">
       <img
         src="images/experience.png"
@@ -449,6 +492,7 @@
       class="bg-video"
       src="title-vid/carmroom.mp4"
       autoplay
+      muted
       loop
       playsinline
     ></video>
@@ -486,8 +530,18 @@
         <p id="videoDescription" class="video-description">
           RADbit APP UI 2
         </p>
-      </div>  
+      </div>
     </div>
+
+    <!-- PACS Projects Section with Hover Effect -->
+    <div class="pacs-section">
+      <p class="pacs-label">PACS Systems</p>
+      <div class="pacs-logo-container" title="Hover to see AdvaPACS">
+        <img src="logo/logo-medisol.png" alt="Medisol PACS" class="pacs-logo-default">
+        <img src="logo/logo-advapacs.png" alt="AdvaPACS" class="pacs-logo-hover">
+      </div>
+    </div>
+
     <div class="image-container">
       <img
         src="images/paper.png"
