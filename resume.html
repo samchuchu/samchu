@@ -659,37 +659,22 @@
       position: relative;
     }
 
-    /* Project logo row - logos next to icon with labels below */
+    /* Project logo row - logos next to icon in horizontal row */
     .project-logo-row {
       display: flex;
-      align-items: flex-start;
+      align-items: center;
       gap: 0.75rem;
       margin-bottom: 0.75rem;
     }
 
-    .project-logo-item {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 4px;
-    }
-
     .project-logo {
-      height: 36px;
+      height: auto;
       width: auto;
       max-width: 55px;
       object-fit: contain;
     }
 
-    .project-logo-label {
-      font-size: 0.6rem;
-      color: var(--text-secondary);
-      text-align: center;
-      white-space: nowrap;
-    }
-
     .project-logo.protocol-doc {
-      height: 42px;
       max-width: 60px;
     }
 
@@ -1307,18 +1292,9 @@
           <div class="project-icon">
             <i data-lucide="shield-check" width="20" height="20"></i>
           </div>
-          <div class="project-logo-item">
-            <img src="images/logos/logo-da.png" alt="DA Medsuites" class="project-logo">
-            <span class="project-logo-label">DA Medsuites</span>
-          </div>
-          <div class="project-logo-item">
-            <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="project-logo">
-            <span class="project-logo-label">Early Medical</span>
-          </div>
-          <div class="project-logo-item">
-            <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="project-logo">
-            <span class="project-logo-label">MORROW</span>
-          </div>
+          <img src="images/logos/logo-da.png" alt="DA Medsuites" class="project-logo">
+          <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="project-logo">
+          <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="project-logo">
         </div>
         <h3 class="project-title">MOH Radiological Licensing</h3>
         <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
@@ -1334,18 +1310,9 @@
           <div class="project-icon">
             <i data-lucide="activity" width="20" height="20"></i>
           </div>
-          <div class="project-logo-item">
-            <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="project-logo protocol-doc">
-            <span class="project-logo-label">Protocol 1</span>
-          </div>
-          <div class="project-logo-item">
-            <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="project-logo protocol-doc">
-            <span class="project-logo-label">Protocol 2</span>
-          </div>
-          <div class="project-logo-item">
-            <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="project-logo protocol-doc">
-            <span class="project-logo-label">Protocol 3</span>
-          </div>
+          <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="project-logo protocol-doc">
+          <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="project-logo protocol-doc">
+          <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="project-logo protocol-doc">
         </div>
         <h3 class="project-title">CT Protocol Optimization</h3>
         <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
@@ -1361,14 +1328,8 @@
           <div class="project-icon">
             <i data-lucide="cpu" width="20" height="20"></i>
           </div>
-          <div class="project-logo-item">
-            <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="project-logo">
-            <span class="project-logo-label">Medisol</span>
-          </div>
-          <div class="project-logo-item">
-            <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="project-logo">
-            <span class="project-logo-label">AdvaPACS</span>
-          </div>
+          <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="project-logo">
+          <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="project-logo">
         </div>
         <h3 class="project-title">PACS & Teleradiology Setup</h3>
         <p class="project-desc">Configured cloud-based PACS storage solutions and established teleradiology service networks for seamless image transfer and remote reporting capabilities.</p>
