@@ -739,6 +739,38 @@
       position: relative;
     }
 
+    /* Inline logos row - displays logos next to the icon */
+    .project-icon-row {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .inline-logos {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .inline-logo {
+      height: 28px;
+      width: auto;
+      max-width: 60px;
+      object-fit: contain;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+
+    .inline-logo:hover {
+      opacity: 1;
+    }
+
+    .inline-logo.protocol-doc {
+      height: 32px;
+      max-width: 50px;
+    }
+
     /* Mobile responsive - tooltip above on small screens */
     @media (max-width: 768px) {
       .logo-tooltip-icon {
@@ -1420,16 +1452,15 @@
     </div>
     
     <div class="projects-grid">
-      <div class="project-card has-tooltip">
-        <div class="project-icon hover-trigger">
-          <i data-lucide="shield-check" width="20" height="20"></i>
-          <div class="logo-tooltip logo-tooltip-icon">
-            <p class="tooltip-text">Licensed Institutions</p>
-            <div class="logo-row">
-              <img src="images/logos/logo-da.png" alt="DA Medsuites" class="hospital-logo">
-              <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="hospital-logo">
-              <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="hospital-logo">
-            </div>
+      <div class="project-card">
+        <div class="project-icon-row">
+          <div class="project-icon">
+            <i data-lucide="shield-check" width="20" height="20"></i>
+          </div>
+          <div class="inline-logos">
+            <img src="images/logos/logo-da.png" alt="DA Medsuites" class="inline-logo">
+            <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="inline-logo">
+            <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="inline-logo">
           </div>
         </div>
         <h3 class="project-title">MOH Radiological Licensing</h3>
@@ -1441,16 +1472,15 @@
         </div>
       </div>
       
-      <div class="project-card has-tooltip">
-        <div class="project-icon hover-trigger">
-          <i data-lucide="activity" width="20" height="20"></i>
-          <div class="logo-tooltip logo-tooltip-icon">
-            <p class="tooltip-text">Protocol Documentation</p>
-            <div class="logo-row">
-              <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="hospital-logo protocol-doc">
-              <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="hospital-logo protocol-doc">
-              <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="hospital-logo protocol-doc">
-            </div>
+      <div class="project-card">
+        <div class="project-icon-row">
+          <div class="project-icon">
+            <i data-lucide="activity" width="20" height="20"></i>
+          </div>
+          <div class="inline-logos">
+            <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="inline-logo protocol-doc">
+            <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="inline-logo protocol-doc">
+            <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="inline-logo protocol-doc">
           </div>
         </div>
         <h3 class="project-title">CT Protocol Optimization</h3>
@@ -1462,15 +1492,14 @@
         </div>
       </div>
       
-      <div class="project-card has-tooltip">
-        <div class="project-icon hover-trigger">
-          <i data-lucide="cpu" width="20" height="20"></i>
-          <div class="logo-tooltip logo-tooltip-icon">
-            <p class="tooltip-text">PACS Systems</p>
-            <div class="logo-row">
-              <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="hospital-logo">
-              <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="hospital-logo">
-            </div>
+      <div class="project-card">
+        <div class="project-icon-row">
+          <div class="project-icon">
+            <i data-lucide="cpu" width="20" height="20"></i>
+          </div>
+          <div class="inline-logos">
+            <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="inline-logo">
+            <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="inline-logo">
           </div>
         </div>
         <h3 class="project-title">PACS & Teleradiology Setup</h3>
