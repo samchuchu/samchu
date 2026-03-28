@@ -654,35 +654,62 @@
       z-index: 100;
     }
 
-    /* Inline logos row - displays logos next to the icon */
-    .project-icon-row {
+    /* Popup tooltip - appears above on hover */
+    .project-card {
+      position: relative;
+    }
+
+    .popup-trigger {
+      cursor: pointer;
+    }
+
+    .popup-logos {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: oklch(0.99 0.02 50 / 0.95);
+      border: 1px solid var(--border-light);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
       display: flex;
       align-items: center;
       gap: 0.75rem;
-      margin-bottom: 1rem;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.2s ease, visibility 0.2s ease;
+      box-shadow: 0 4px 16px oklch(0 0 0 / 0.1);
+      z-index: 100;
+      white-space: nowrap;
     }
 
-    .inline-logos {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
+    .popup-logos::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 12px;
+      height: 12px;
+      background: oklch(0.99 0.02 50 / 0.95);
+      border-right: 1px solid var(--border-light);
+      border-bottom: 1px solid var(--border-light);
     }
 
-    .inline-logo {
-      height: 28px;
+    .popup-trigger:hover .popup-logos {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .popup-logo {
+      height: 32px;
       width: auto;
       max-width: 60px;
       object-fit: contain;
-      opacity: 0.85;
-      transition: opacity 0.2s ease;
     }
 
-    .inline-logo:hover {
-      opacity: 1;
-    }
-
-    .inline-logo.protocol-doc {
-      height: 32px;
+    .popup-logo.protocol-doc {
+      height: 36px;
       max-width: 50px;
     }
 
@@ -1295,16 +1322,14 @@
     </div>
     
     <div class="projects-grid">
-      <div class="project-card">
-        <div class="project-icon-row">
-          <div class="project-icon">
-            <i data-lucide="shield-check" width="20" height="20"></i>
-          </div>
-          <div class="inline-logos">
-            <img src="images/logos/logo-da.png" alt="DA Medsuites" class="inline-logo">
-            <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="inline-logo">
-            <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="inline-logo">
-          </div>
+      <div class="project-card popup-trigger">
+        <div class="project-icon">
+          <i data-lucide="shield-check" width="20" height="20"></i>
+        </div>
+        <div class="popup-logos">
+          <img src="images/logos/logo-da.png" alt="DA Medsuites" class="popup-logo">
+          <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="popup-logo">
+          <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="popup-logo">
         </div>
         <h3 class="project-title">MOH Radiological Licensing</h3>
         <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
@@ -1315,16 +1340,14 @@
         </div>
       </div>
       
-      <div class="project-card">
-        <div class="project-icon-row">
-          <div class="project-icon">
-            <i data-lucide="activity" width="20" height="20"></i>
-          </div>
-          <div class="inline-logos">
-            <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="inline-logo protocol-doc">
-            <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="inline-logo protocol-doc">
-            <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="inline-logo protocol-doc">
-          </div>
+      <div class="project-card popup-trigger">
+        <div class="project-icon">
+          <i data-lucide="activity" width="20" height="20"></i>
+        </div>
+        <div class="popup-logos">
+          <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="popup-logo protocol-doc">
+          <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="popup-logo protocol-doc">
+          <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="popup-logo protocol-doc">
         </div>
         <h3 class="project-title">CT Protocol Optimization</h3>
         <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
@@ -1335,15 +1358,13 @@
         </div>
       </div>
       
-      <div class="project-card">
-        <div class="project-icon-row">
-          <div class="project-icon">
-            <i data-lucide="cpu" width="20" height="20"></i>
-          </div>
-          <div class="inline-logos">
-            <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="inline-logo">
-            <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="inline-logo">
-          </div>
+      <div class="project-card popup-trigger">
+        <div class="project-icon">
+          <i data-lucide="cpu" width="20" height="20"></i>
+        </div>
+        <div class="popup-logos">
+          <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="popup-logo">
+          <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="popup-logo">
         </div>
         <h3 class="project-title">PACS & Teleradiology Setup</h3>
         <p class="project-desc">Configured cloud-based PACS storage solutions and established teleradiology service networks for seamless image transfer and remote reporting capabilities.</p>
