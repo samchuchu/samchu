@@ -708,29 +708,32 @@
       border-bottom: 1px solid var(--border-light);
     }
 
-    /* Right-positioned tooltip variant - shows to the right side of the card */
-    .logo-tooltip-right {
-      left: calc(100% + 12px);
+    /* Icon-tooltip variant - appears next to the project icon */
+    .logo-tooltip-icon {
+      position: absolute;
+      left: calc(100% + 10px);
+      top: 0;
       transform: none;
-      bottom: auto;
-      top: 50%;
-      transform: translateY(-50%);
-      min-width: 280px;
-      max-width: 320px;
+      min-width: 260px;
+      max-width: 300px;
     }
 
-    .logo-tooltip-right::before {
+    .logo-tooltip-icon::before {
       content: '';
       position: absolute;
       left: -6px;
-      top: 50%;
-      transform: translateY(-50%) rotate(45deg);
+      top: 20px;
+      transform: rotate(45deg);
       width: 12px;
       height: 12px;
       background: oklch(0.99 0.01 50 / 0.98);
-      border: none;
       border-left: 1px solid var(--border-light);
       border-bottom: 1px solid var(--border-light);
+    }
+
+    /* Position tooltip from the project icon */
+    .project-icon {
+      position: relative;
     }
 
     .has-tooltip:hover .logo-tooltip {
@@ -1394,18 +1397,18 @@
     
     <div class="projects-grid">
       <div class="project-card has-tooltip">
-        <div class="project-icon">
+        <div class="project-icon hover-trigger">
           <i data-lucide="shield-check" width="20" height="20"></i>
-        </div>
-        <h3 class="project-title hover-trigger">MOH Radiological Licensing</h3>
-        <div class="logo-tooltip logo-tooltip-right">
-          <p class="tooltip-text">Licensed Institutions</p>
-          <div class="logo-row">
-            <img src="images/logos/logo-da.png" alt="DA Medsuites" class="hospital-logo">
-            <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="hospital-logo">
-            <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="hospital-logo">
+          <div class="logo-tooltip logo-tooltip-icon">
+            <p class="tooltip-text">Licensed Institutions</p>
+            <div class="logo-row">
+              <img src="images/logos/logo-da.png" alt="DA Medsuites" class="hospital-logo">
+              <img src="images/logos/logo-early.png" alt="Early Medical Centre" class="hospital-logo">
+              <img src="images/logos/logo-morrow.png" alt="MORROW MEDICAL" class="hospital-logo">
+            </div>
           </div>
         </div>
+        <h3 class="project-title">MOH Radiological Licensing</h3>
         <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
         <div class="project-tags">
           <span class="project-tag">Regulatory</span>
@@ -1415,18 +1418,18 @@
       </div>
       
       <div class="project-card has-tooltip">
-        <div class="project-icon">
+        <div class="project-icon hover-trigger">
           <i data-lucide="activity" width="20" height="20"></i>
-        </div>
-        <h3 class="project-title hover-trigger">CT Protocol Optimization</h3>
-        <div class="logo-tooltip logo-tooltip-right">
-          <p class="tooltip-text">Protocol Documentation</p>
-          <div class="logo-row">
-            <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="hospital-logo protocol-doc">
-            <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="hospital-logo protocol-doc">
-            <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="hospital-logo protocol-doc">
+          <div class="logo-tooltip logo-tooltip-icon">
+            <p class="tooltip-text">Protocol Documentation</p>
+            <div class="logo-row">
+              <img src="images/docs/doc01.png" alt="Protocol Doc 1" class="hospital-logo protocol-doc">
+              <img src="images/docs/doc02.png" alt="Protocol Doc 2" class="hospital-logo protocol-doc">
+              <img src="images/docs/doc03.png" alt="Protocol Doc 3" class="hospital-logo protocol-doc">
+            </div>
           </div>
         </div>
+        <h3 class="project-title">CT Protocol Optimization</h3>
         <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
         <div class="project-tags">
           <span class="project-tag">CT Imaging</span>
@@ -1436,17 +1439,17 @@
       </div>
       
       <div class="project-card has-tooltip">
-        <div class="project-icon">
+        <div class="project-icon hover-trigger">
           <i data-lucide="cpu" width="20" height="20"></i>
-        </div>
-        <h3 class="project-title hover-trigger">PACS & Teleradiology Setup</h3>
-        <div class="logo-tooltip logo-tooltip-right">
-          <p class="tooltip-text">PACS Systems</p>
-          <div class="logo-row">
-            <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="hospital-logo">
-            <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="hospital-logo">
+          <div class="logo-tooltip logo-tooltip-icon">
+            <p class="tooltip-text">PACS Systems</p>
+            <div class="logo-row">
+              <img src="images/logos/logo-medisol.png" alt="Medisol PACS" class="hospital-logo">
+              <img src="images/logos/logo-advapacs.png" alt="AdvaPACS" class="hospital-logo">
+            </div>
           </div>
         </div>
+        <h3 class="project-title">PACS & Teleradiology Setup</h3>
         <p class="project-desc">Configured cloud-based PACS storage solutions and established teleradiology service networks for seamless image transfer and remote reporting capabilities.</p>
         <div class="project-tags">
           <span class="project-tag">PACS</span>
