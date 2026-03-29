@@ -1484,45 +1484,6 @@
 
   <script>
     lucide.createIcons();
-    
-    // GIF hover play control - GIF only plays while mouse is hovering
-    document.querySelectorAll('.project-logo-wrapper').forEach(wrapper => {
-      const img = wrapper.querySelector('img');
-      const gifSrc = img.src;
-      
-      // Create a canvas to capture the first frame as static image
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
-      const staticImg = new Image();
-      
-      // When GIF loads, capture first frame
-      staticImg.onload = function() {
-        canvas.width = staticImg.naturalWidth;
-        canvas.height = staticImg.naturalHeight;
-        ctx.drawImage(staticImg, 0, 0);
-        // Store the static data URL
-        wrapper.dataset.staticSrc = canvas.toDataURL('image/png');
-        // Set initial static frame
-        img.src = wrapper.dataset.staticSrc;
-      };
-      staticImg.src = gifSrc;
-      
-      // Store original GIF src
-      wrapper.dataset.gifSrc = gifSrc;
-      
-      // Hover events
-      wrapper.addEventListener('mouseenter', () => {
-        if (wrapper.dataset.gifSrc) {
-          img.src = wrapper.dataset.gifSrc;
-        }
-      });
-      
-      wrapper.addEventListener('mouseleave', () => {
-        if (wrapper.dataset.staticSrc) {
-          img.src = wrapper.dataset.staticSrc;
-        }
-      });
-    });
   </script>
 </body>
 </html>
