@@ -1761,11 +1761,24 @@
         try {
           // Send to Google Sheets + Telegram
           if (ENABLE_TELEGRAM) {
-            await fetch(GOOGLE_SCRIPT_URL, {
+            const response = await fetch(GOOGLE_SCRIPT_URL, {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
+              headers: { 
+                'Content-Type': 'text/plain;charset=utf-8'
+              },
               body: JSON.stringify(data)
             });
+            
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('Google Script response:', result);
+            
+            if (!result.success) {
+              throw new Error(result.error || 'Unknown error');
+            }
           }
           
           // Store in localStorage as backup
