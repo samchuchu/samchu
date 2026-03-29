@@ -689,6 +689,44 @@
       max-width: 100px;
     }
 
+    /* Project Logo Hover Effect - Muted by default, animated on hover */
+    .project-logo-wrapper {
+      position: relative;
+      display: inline-block;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .project-logo-wrapper::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: oklch(0.98 0.015 50 / 0.85);
+      mix-blend-mode: saturation;
+      opacity: 1;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    .project-logo-wrapper:hover::before {
+      opacity: 0;
+    }
+
+    .project-logo-wrapper img {
+      display: block;
+      filter: grayscale(50%) brightness(0.9) contrast(0.9);
+      transition: filter 0.4s ease;
+    }
+
+    .project-logo-wrapper:hover img {
+      filter: grayscale(0%) brightness(1) contrast(1);
+    }
+
     .project-icon {
       width: 42px;
       height: 42px;
@@ -1303,7 +1341,9 @@
           <div class="project-icon">
             <i data-lucide="shield-check" width="20" height="20"></i>
           </div>
-          <img src="images/logos/logo-line.gif" alt="Logo" class="project-logo">
+          <div class="project-logo-wrapper">
+            <img src="images/logos/logo-line.gif" alt="Logo" class="project-logo">
+          </div>
         </div>
         <h3 class="project-title">MOH Radiological Licensing</h3>
         <p class="project-desc">Successfully prepared and obtained radiological license applications for multiple healthcare startups, including QA manual development and compliance documentation.</p>
@@ -1319,7 +1359,9 @@
           <div class="project-icon">
             <i data-lucide="activity" width="20" height="20"></i>
           </div>
-          <img src="images/docs/doc-line.gif" alt="Protocol" class="project-logo protocol-doc">
+          <div class="project-logo-wrapper">
+            <img src="images/docs/doc-line.gif" alt="Protocol" class="project-logo protocol-doc">
+          </div>
         </div>
         <h3 class="project-title">CT Protocol Optimization</h3>
         <p class="project-desc">Developed and implemented optimized CT scanning protocols balancing diagnostic quality with radiation dose reduction, particularly for vulnerable patient populations.</p>
@@ -1335,7 +1377,9 @@
           <div class="project-icon">
             <i data-lucide="cpu" width="20" height="20"></i>
           </div>
-          <img src="images/logos/logo-IT.gif" alt="Logo" class="project-logo">
+          <div class="project-logo-wrapper">
+            <img src="images/logos/logo-IT.gif" alt="Logo" class="project-logo">
+          </div>
         </div>
         <h3 class="project-title">PACS & Teleradiology Setup</h3>
         <p class="project-desc">Configured cloud-based PACS storage solutions and established teleradiology service networks for seamless image transfer and remote reporting capabilities.</p>
