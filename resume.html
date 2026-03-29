@@ -1277,6 +1277,15 @@
     .grab-sam-in-modal .form-content.hidden {
       display: none;
     }
+
+    /* Loading spinner animation */
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    .animate-spin {
+      animation: spin 1s linear infinite;
+    }
   </style>
 </head>
 <body>
@@ -1289,8 +1298,8 @@
       </button>
       
       <div class="form-content" id="grabSamInFormContent">
-        <h3>Grab Sam In</h3>
-        <p>Send me a job listing and your email so I can review it directly.</p>
+        <h3>Share Your Opportunity 🐱</h3>
+        <p>Share with me your opportunity posting link, hoping it would save your precious time! I'll review and get back to you soon.</p>
         
         <div class="form-group">
           <label for="grabSamEmail">Your Email</label>
@@ -1675,7 +1684,7 @@
       </a>
       <button class="contact-link" id="grabSamInBtn">
         <i data-lucide="hand" width="16" height="16"></i>
-        <span>Grab Sam In</span>
+        <span>Share with me your opportunity posting link 🐱</span>
       </button>
     </div>
   </section>
@@ -1723,8 +1732,12 @@
         if (e.key === 'Escape') closeModal();
       });
       
+      // === CONFIGURATION ===
+      const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbz1dVbjSp5vMIM8Pt-9mUF2B7581BmlqBAQtJwGP1PbQ2j_U76dtfyUM9TLPURZZxxJJQ/exec';
+      const ENABLE_TELEGRAM = true;
+      
       // Submit handler
-      submitBtn.addEventListener('click', () => {
+      submitBtn.addEventListener('click', async () => {
         const email = document.getElementById('grabSamEmail').value.trim();
         const jobLink = document.getElementById('grabSamJobLink').value.trim();
         
@@ -1733,26 +1746,59 @@
           return;
         }
         
-        // Store in localStorage
+        // Show loading state
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<span>Sending...</span><i data-lucide="loader" width="16" height="16" class="animate-spin"></i>';
+        lucide.createIcons();
+        
         const data = {
           email: email,
           jobLink: jobLink,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
+          userAgent: navigator.userAgent
         };
         
-        const existing = JSON.parse(localStorage.getItem('grabSamIn') || '[]');
-        existing.push(data);
-        localStorage.setItem('grabSamIn', JSON.stringify(existing));
-        
-        // Log for easy access
-        console.log('📋 New Grab Sam In submission:', data);
-        
-        // Show success
-        formContent.classList.add('hidden');
-        successMsg.classList.add('show');
-        
-        // Auto close after 3 seconds
-        setTimeout(closeModal, 3000);
+        try {
+          // Send to Google Sheets + Telegram
+          if (ENABLE_TELEGRAM) {
+            await fetch(GOOGLE_SCRIPT_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data)
+            });
+          }
+          
+          // Store in localStorage as backup
+          const existing = JSON.parse(localStorage.getItem('grabSamIn') || '[]');
+          existing.push(data);
+          localStorage.setItem('grabSamIn', JSON.stringify(existing));
+          
+          console.log('✅ Submission recorded:', data);
+          
+          // Show success
+          formContent.classList.add('hidden');
+          successMsg.classList.add('show');
+          
+          // Auto close after 3 seconds
+          setTimeout(closeModal, 3000);
+          
+        } catch (error) {
+          console.error('❌ Submission failed:', error);
+          
+          // Fallback: save locally
+          const existing = JSON.parse(localStorage.getItem('grabSamIn') || '[]');
+          existing.push(data);
+          localStorage.setItem('grabSamIn', JSON.stringify(existing));
+          
+          alert('Thanks! Saved locally. (Remote sync failed - check console)');
+          formContent.classList.add('hidden');
+          successMsg.classList.add('show');
+          setTimeout(closeModal, 3000);
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = '<span>Submit Interest</span><i data-lucide="send" width="16" height="16"></i>';
+          lucide.createIcons();
+        }
       });
     })();
   </script>
