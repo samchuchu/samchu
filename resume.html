@@ -689,42 +689,56 @@
       max-width: 100px;
     }
 
-    /* Project Logo Hover Effect - Muted by default, animated on hover */
+    /* Project Logo Wrapper - simple container */
     .project-logo-wrapper {
       position: relative;
       display: inline-block;
-      cursor: pointer;
-      border-radius: 8px;
-      overflow: hidden;
     }
 
-    .project-logo-wrapper::before {
+    /* Project Card Popup - shows GIF on card hover */
+    .project-card {
+      position: relative;
+    }
+
+    .project-gif-popup {
+      position: absolute;
+      top: -150px;
+      left: 50%;
+      transform: translateX(-50%) scale(0);
+      background: white;
+      padding: 12px;
+      border-radius: 12px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      opacity: 0;
+      transition: all 0.3s ease;
+      pointer-events: none;
+      min-width: 200px;
+      text-align: center;
+    }
+
+    .project-card:hover .project-gif-popup {
+      transform: translateX(-50%) scale(1);
+      opacity: 1;
+    }
+
+    .project-gif-popup img {
+      max-width: 100%;
+      max-height: 200px;
+      border-radius: 8px;
+      display: block;
+      margin: 0 auto;
+    }
+
+    .project-gif-popup::after {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: oklch(0.98 0.015 50 / 0.85);
-      mix-blend-mode: saturation;
-      opacity: 1;
-      transition: opacity 0.4s ease;
-      z-index: 1;
-      pointer-events: none;
-    }
-
-    .project-logo-wrapper:hover::before {
-      opacity: 0;
-    }
-
-    .project-logo-wrapper img {
-      display: block;
-      filter: grayscale(50%) brightness(0.9) contrast(0.9);
-      transition: filter 0.4s ease;
-    }
-
-    .project-logo-wrapper:hover img {
-      filter: grayscale(0%) brightness(1) contrast(1);
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid white;
     }
 
     .project-icon {
@@ -1337,6 +1351,11 @@
     
     <div class="projects-grid">
       <div class="project-card">
+        <!-- Popup GIF -->
+        <div class="project-gif-popup">
+          <img src="images/logos/logo-line.gif" alt="MOH Licensing GIF">
+        </div>
+        
         <div class="project-logo-row">
           <div class="project-icon">
             <i data-lucide="shield-check" width="20" height="20"></i>
@@ -1355,6 +1374,11 @@
       </div>
       
       <div class="project-card">
+        <!-- Popup GIF -->
+        <div class="project-gif-popup">
+          <img src="images/docs/doc-line.gif" alt="Protocol GIF">
+        </div>
+        
         <div class="project-logo-row">
           <div class="project-icon">
             <i data-lucide="activity" width="20" height="20"></i>
@@ -1373,6 +1397,11 @@
       </div>
       
       <div class="project-card">
+        <!-- Popup GIF -->
+        <div class="project-gif-popup">
+          <img src="images/logos/logo-IT.gif" alt="PACS GIF">
+        </div>
+        
         <div class="project-logo-row">
           <div class="project-icon">
             <i data-lucide="cpu" width="20" height="20"></i>
