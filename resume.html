@@ -73,6 +73,21 @@
       line-height: 1.7;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
+      position: relative;
+    }
+
+    /* Full-width background to fill empty margins */
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: url('images/bg-06.png?v=1') center center / cover no-repeat;
+      opacity: 0.15;
+      pointer-events: none;
+      z-index: -1;
     }
 
     /* === Hero Section - Enhanced Readability === */
@@ -1599,15 +1614,23 @@
       </div>
       
       <div class="project-card">
-        <div class="project-icon">
-          <i data-lucide="baby" width="20" height="20"></i>
+        <!-- Popup GIF -->
+        <div class="project-gif-popup">
+          <img src="images/logos/logo-certs.gif" alt="Professional Certifications GIF">
         </div>
-        <h3 class="project-title">NICU Dose Reduction Initiative</h3>
-        <p class="project-desc">Led quality improvement project at NUH to reduce radiation dose for NICU patients using advanced DR system technology, improving patient safety outcomes.</p>
+        
+        <div class="project-logo-row">
+          <div class="project-icon">
+            <i data-lucide="award" width="20" height="20"></i>
+          </div>
+        </div>
+        <h3 class="project-title">Professional Certifications</h3>
+        <p class="project-desc">AHPC Registered Radiographer (R1), Basic Cardiac Life Support (BCLS) certified. Current and active professional licenses for diagnostic imaging practice in Singapore.</p>
         <div class="project-tags">
-          <span class="project-tag">QI Project</span>
-          <span class="project-tag">Pediatric</span>
-          <span class="project-tag">Dose Safety</span>
+          <span class="project-tag">AHPC</span>
+          <span class="project-tag">R1</span>
+          <span class="project-tag">BCLS</span>
+          <span class="project-tag">Licensed</span>
         </div>
       </div>
     </div>
