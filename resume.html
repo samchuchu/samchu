@@ -893,7 +893,10 @@
     }
 
     .education-card:hover, .languages-card:hover {
-      background: oklch(0.98 0.015 50 / 1);
+      border-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px oklch(0 0 0 / 0.1);
+      z-index: 50;
     }
 
     .edu-header, .lang-header {
@@ -1125,10 +1128,16 @@
 
     /* Enhanced hover effects */
     .skill-card:hover,
-    .education-card:hover,
     .languages-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 16px oklch(0 0 0 / 0.1);
+    }
+
+    .education-card:hover {
+      border-color: var(--accent-light);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px oklch(0 0 0 / 0.1);
+      z-index: 50;
     }
 
     /* Improved typography hierarchy */
