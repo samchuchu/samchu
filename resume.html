@@ -883,12 +883,17 @@
     }
 
     .education-card, .languages-card {
-      background: oklch(0.98 0.015 50 / 0.95);
+      background: oklch(0.98 0.015 50 / 0.5);
       padding: 2rem;
       border-radius: var(--radius);
       border: 1px solid var(--border-light);
       backdrop-filter: blur(4px);
       box-shadow: 0 2px 12px oklch(0 0 0 / 0.05);
+      transition: background 0.25s ease;
+    }
+
+    .education-card:hover, .languages-card:hover {
+      background: oklch(0.98 0.015 50 / 1);
     }
 
     .edu-header, .lang-header {
@@ -1119,9 +1124,7 @@
     }
 
     /* Enhanced hover effects */
-    .skill-card:hover,
-    .education-card:hover,
-    .languages-card:hover {
+    .skill-card:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 16px oklch(0 0 0 / 0.1);
     }
