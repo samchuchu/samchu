@@ -219,6 +219,43 @@
       box-shadow: 0 12px 32px oklch(0 0 0 / 0.2);
     }
 
+    .hero-cta-group {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      justify-content: center;
+      opacity: 0;
+      animation: fadeInUp 1s ease-out 0.65s forwards;
+    }
+
+    .voice-guide-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.9rem 1.75rem;
+      background: var(--accent-primary);
+      color: var(--accent-foreground);
+      border-radius: 100px;
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.9rem;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px oklch(0 0 0 / 0.15);
+      cursor: pointer;
+      border: none;
+    }
+
+    .voice-guide-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px oklch(0 0 0 / 0.2);
+      filter: brightness(1.05);
+    }
+
+    .voice-guide-btn .btn-text-pause { display: none; }
+    .voice-guide-btn.playing .btn-text-play  { display: none; }
+    .voice-guide-btn.playing .btn-text-pause { display: inline; }
+
     .scroll-indicator {
       position: absolute;
       bottom: 2.5rem;
@@ -1349,10 +1386,18 @@
       <p class="hero-title">Transforming Diagnostic Imaging</p>
       <div class="hero-divider"></div>
       <p class="hero-tagline">From setup to scan — 11+ years of clinical excellence across world-class hospitals and innovative healthcare startups.</p>
-      <a href="#about" class="hero-cta">
-        <span>Explore My Work</span>
-        <i data-lucide="arrow-down" width="16" height="16"></i>
-      </a>
+      <div class="hero-cta-group">
+        <a href="#about" class="hero-cta">
+          <span>Explore My Work</span>
+          <i data-lucide="arrow-down" width="16" height="16"></i>
+        </a>
+        <button class="voice-guide-btn" id="voiceGuideBtn">
+          <i data-lucide="play-circle" width="16" height="16" class="icon-play"></i>
+          <i data-lucide="pause-circle" width="16" height="16" class="icon-pause" style="display:none"></i>
+          <span class="btn-text-play">Voice Guide</span>
+          <span class="btn-text-pause">Pause Guide</span>
+        </button>
+      </div>
     </div>
     
     <div class="scroll-indicator">
@@ -1722,9 +1767,40 @@
   </footer>
 
   <script>
+    // Voice Guide – play / pause resume_voice.mp3
+    (function () {
+      const btn     = document.getElementById('voiceGuideBtn');
+      const iconPlay  = btn.querySelector('.icon-play');
+      const iconPause = btn.querySelector('.icon-pause');
+
+      const audio = new Audio('title-vid/resume_voice.mp3');
+      audio.preload = 'metadata';
+
+      btn.addEventListener('click', function () {
+        if (audio.paused) {
+          audio.play().then(function () {
+            btn.classList.add('playing');
+            iconPlay.style.display  = 'none';
+            iconPause.style.display = 'inline';
+          }).catch(function (err) {
+            console.warn('Audio play failed:', err);
+          });
+        } else {
+          audio.pause();
+          btn.classList.remove('playing');
+          iconPlay.style.display  = 'inline';
+          iconPause.style.display = 'none';
+        }
+      });
+
+      audio.addEventListener('ended', function () {
+        btn.classList.remove('playing');
+        iconPlay.style.display  = 'inline';
+        iconPause.style.display = 'none';
+      });
+    })();
+
     lucide.createIcons();
-    
-    // Grab Sam In Modal
     (function() {
       const modal = document.getElementById('grabSamInModal');
       const btn = document.getElementById('grabSamInBtn');
