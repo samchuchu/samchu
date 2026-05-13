@@ -179,10 +179,10 @@
     }
 
     .hero-name {
-      font-size: clamp(2.5rem, 5vw, 4rem);
+      font-size: clamp(3.5rem, 7vw, 6rem);
       font-weight: 800;
       line-height: 1.05;
-      letter-spacing: -0.03em;
+      letter-spacing: -0.04em;
       margin-bottom: 0.75rem;
     }
     .hero-name span {
@@ -193,7 +193,7 @@
     }
 
     .hero-role {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 500;
       color: var(--text-soft);
       margin-bottom: 1.5rem;
@@ -318,47 +318,25 @@
       top: 16px;
       left: 16px;
     }
-    .deco-2 {
-      width: 120px;
-      height: 120px;
-      border: 2px solid var(--accent);
-      bottom: -20px;
-      right: -20px;
-      animation: spin-slow 30s linear infinite;
-    }
-    @keyframes spin-slow {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
 
-    /* Floating badge */
-    .float-badge {
+    /* Bubbles */
+    .bubble {
       position: absolute;
-      bottom: 60px;
-      left: -30px;
-      background: var(--glass);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 1rem 1.25rem;
+      border-radius: 50%;
+      pointer-events: none;
       z-index: 3;
-      animation: floatBadge 4s ease-in-out infinite;
-      box-shadow: 0 4px 20px oklch(0 0 0 / 0.08);
     }
-    @keyframes floatBadge {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-8px); }
-    }
-    .float-badge .badge-num {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--accent);
-      line-height: 1;
-    }
-    .float-badge .badge-label {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      margin-top: 0.25rem;
+    .bubble-1 { width: 20px; height: 20px; background: var(--accent); opacity: 0.4; top: -10px; left: 20%; animation: bubbleFloat 5s ease-in-out infinite; }
+    .bubble-2 { width: 12px; height: 12px; background: var(--accent-light); opacity: 0.5; top: 30%; right: -15px; animation: bubbleFloat 7s ease-in-out infinite 1s; }
+    .bubble-3 { width: 18px; height: 18px; background: var(--accent-pale); opacity: 0.35; bottom: 15%; left: -10px; animation: bubbleFloat 6s ease-in-out infinite 2s; }
+    .bubble-4 { width: 10px; height: 10px; background: var(--accent); opacity: 0.6; top: 60%; right: -8px; animation: bubbleFloat 4s ease-in-out infinite 0.5s; }
+    .bubble-5 { width: 24px; height: 24px; background: transparent; border: 2px solid var(--accent-light); opacity: 0.3; top: 10%; left: -15px; animation: bubbleFloat 8s ease-in-out infinite 1.5s; }
+    .bubble-6 { width: 14px; height: 14px; background: var(--accent); opacity: 0.25; bottom: 30%; right: -12px; animation: bubbleFloat 5.5s ease-in-out infinite 3s; }
+    .bubble-7 { width: 16px; height: 16px; background: var(--accent-pale); opacity: 0.45; top: 45%; left: -18px; animation: bubbleFloat 6.5s ease-in-out infinite 2.5s; }
+
+    @keyframes bubbleFloat {
+      0%, 100% { transform: translateY(0) scale(1); }
+      50% { transform: translateY(-15px) scale(1.1); }
     }
 
     /* === STATS BAR === */
@@ -653,6 +631,59 @@
       opacity: 0.9;
       text-shadow: 0 1px 4px oklch(0 0 0 / 0.5);
     }
+    .showcase-caption .showcase-tagline {
+      font-size: 1.05rem;
+      opacity: 0.9;
+      margin-bottom: 1rem;
+      font-weight: 500;
+    }
+    .showcase-details {
+      background: oklch(0.1 0 0 / 0.5);
+      backdrop-filter: blur(8px);
+      border-radius: 12px;
+      padding: 1.25rem;
+      margin-top: 0.75rem;
+    }
+    .showcase-details p {
+      font-size: 0.95rem;
+      line-height: 1.7;
+      margin-bottom: 0.75rem;
+      opacity: 0.9;
+    }
+    .showcase-details ul {
+      list-style: none;
+      margin-bottom: 0.75rem;
+    }
+    .showcase-details li {
+      font-size: 0.85rem;
+      padding: 0.35rem 0;
+      padding-left: 1.25rem;
+      position: relative;
+      opacity: 0.85;
+    }
+    .showcase-details li::before {
+      content: '•';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+    .showcase-meta {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+      margin-top: 0.5rem;
+    }
+    .meta-tag {
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.7rem;
+      border-radius: 100px;
+      background: oklch(0.95 0.04 45 / 0.15);
+      color: oklch(0.85 0.08 45);
+      border: 1px solid oklch(0.85 0.08 45 / 0.3);
+    }
 
     /* === CTA === */
     .cta-section {
@@ -819,10 +850,7 @@
     <div class="hero-content">
       <div class="hero-left">
         <div class="hero-eyebrow">Senior CT Radiographer</div>
-        <h1 class="hero-name">
-          Sam<br>
-          <span>Chu</span>
-        </h1>
+        <h1 class="hero-name">Sam <span>Chu</span></h1>
         <p class="hero-role">Transforming Diagnostic Imaging</p>
         <p class="hero-bio">
           11+ years of clinical excellence across world-class hospitals and innovative healthcare startups. From setup to scan — building imaging services from the ground up.
@@ -841,10 +869,13 @@
           <div class="portrait-deco deco-1"></div>
           <img src="images/hero-portrait.jpg" alt="Sam Chu - Senior CT Radiographer" loading="eager" decoding="async" fetchpriority="high">
           <div class="portrait-deco deco-2"></div>
-          <div class="float-badge">
-            <div class="badge-num">11+</div>
-            <div class="badge-label">Years Experience</div>
-          </div>
+          <div class="bubble bubble-1"></div>
+          <div class="bubble bubble-2"></div>
+          <div class="bubble bubble-3"></div>
+          <div class="bubble bubble-4"></div>
+          <div class="bubble bubble-5"></div>
+          <div class="bubble bubble-6"></div>
+          <div class="bubble bubble-7"></div>
         </div>
       </div>
     </div>
@@ -976,14 +1007,40 @@
         <img src="images/showcase-1.jpg" alt="CT Protocol Optimization" loading="lazy" decoding="async">
         <div class="showcase-caption">
           <h4>CT Protocol Optimization</h4>
-          <p>Dose-reduced protocols for vulnerable populations</p>
+          <p class="showcase-tagline">Dose-reduced imaging protocols for vulnerable populations</p>
+          <div class="showcase-details">
+            <p>Developed and validated low-dose CT protocols specifically for pediatric and geriatric patients, reducing radiation exposure by up to <strong>40%</strong> while maintaining diagnostic image quality.</p>
+            <ul>
+              <li>Custom tube current modulation algorithms</li>
+              <li>Pediatric-specific kernel optimization</li>
+              <li>Iterative reconstruction parameter tuning</li>
+            </ul>
+            <div class="showcase-meta">
+              <span class="meta-tag">Dose Reduction</span>
+              <span class="meta-tag">QA</span>
+              <span class="meta-tag">Pediatric</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="showcase-item">
         <img src="images/showcase-2.jpg" alt="PACS & Infrastructure" loading="lazy" decoding="async">
         <div class="showcase-caption">
-          <h4>PACS & Teleradiology</h4>
-          <p>Cloud-based imaging infrastructure setup</p>
+          <h4>PACS & Teleradiology Infrastructure</h4>
+          <p class="showcase-tagline">Cloud-based imaging networks from scratch</p>
+          <div class="showcase-details">
+            <p>Led the architecture and deployment of cloud-native PACS systems across three healthcare startups, enabling seamless image sharing between clinics, radiologists, and referring physicians.</p>
+            <ul>
+              <li>End-to-end DICOM routing & HL7 integration</li>
+              <li>Multi-site VPN tunnel configuration</li>
+              <li>AI-assisted workflow automation</li>
+            </ul>
+            <div class="showcase-meta">
+              <span class="meta-tag">PACS</span>
+              <span class="meta-tag">Cloud</span>
+              <span class="meta-tag">Integration</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
