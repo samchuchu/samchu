@@ -8,137 +8,139 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
-  <script data-goatcounter="https://samchuchu.goatcounter.com/count"
-          async src="//gc.zgo.at/count.js"></script>
   <style>
     :root {
-      --bg-primary: oklch(0.985 0.015 50);
-      --bg-secondary: oklch(0.96 0.02 50);
-      --bg-tertiary: oklch(0.92 0.025 50);
-      --text-primary: oklch(0.18 0.02 50);
-      --text-secondary: oklch(0.38 0.025 50);
-      --text-muted: oklch(0.55 0.02 50);
-      --accent-primary: oklch(0.5 0.15 45);
-      --accent-light: oklch(0.7 0.12 45);
-      --accent-warm: oklch(0.55 0.08 35);
-      --prestige-gold: oklch(0.55 0.15 55);
-      --border: oklch(0.85 0.015 50);
-      --border-light: oklch(0.92 0.01 50);
-      --font-sans: 'Outfit', system-ui, sans-serif;
+      --bg: oklch(0.985 0.01 60);
+      --bg-warm: oklch(0.97 0.015 55);
+      --bg-deep: oklch(0.2 0.02 50);
+      --text: oklch(0.18 0.01 50);
+      --text-soft: oklch(0.4 0.015 50);
+      --text-muted: oklch(0.55 0.01 50);
+      --accent: oklch(0.5 0.14 45);
+      --accent-light: oklch(0.7 0.1 45);
+      --accent-pale: oklch(0.9 0.04 45);
+      --glass: oklch(1 0 0 / 0.6);
+      --border: oklch(0.88 0.01 50);
+      --font: 'Outfit', system-ui, sans-serif;
       --font-mono: 'JetBrains Mono', monospace;
-      --radius: 16px;
-      --radius-sm: 10px;
     }
 
-    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     html { scroll-behavior: smooth; }
 
     body {
-      font-family: var(--font-sans);
-      background: var(--bg-primary);
-      color: var(--text-primary);
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
     }
 
-    /* ===== HERO ===== */
+    /* === HERO === */
     .hero {
       min-height: 100vh;
       display: flex;
-      flex-direction: column;
       align-items: center;
       justify-content: center;
-      text-align: center;
-      padding: 6rem 2rem 4rem;
       position: relative;
       overflow: hidden;
+      padding: 2rem;
     }
 
     .hero-bg {
       position: absolute;
       inset: 0;
       background:
-        radial-gradient(ellipse 80% 60% at 20% 40%, oklch(0.7 0.12 45 / 0.12) 0%, transparent 60%),
-        radial-gradient(ellipse 60% 50% at 80% 20%, oklch(0.65 0.1 220 / 0.08) 0%, transparent 50%),
-        radial-gradient(ellipse 50% 40% at 60% 80%, oklch(0.7 0.08 35 / 0.1) 0%, transparent 50%);
+        radial-gradient(ellipse 80% 60% at 20% 40%, oklch(0.85 0.08 55 / 0.35) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 50% at 80% 60%, oklch(0.82 0.06 220 / 0.25) 0%, transparent 50%),
+        radial-gradient(ellipse 50% 40% at 50% 100%, oklch(0.88 0.05 160 / 0.2) 0%, transparent 50%),
+        linear-gradient(160deg, var(--bg) 0%, oklch(0.98 0.015 55) 50%, var(--bg) 100%);
       z-index: 0;
     }
 
-    .hero-grid {
+    .hero-orb {
       position: absolute;
-      inset: 0;
-      background-image:
-        linear-gradient(oklch(0.85 0.01 50 / 0.3) 1px, transparent 1px),
-        linear-gradient(90deg, oklch(0.85 0.01 50 / 0.3) 1px, transparent 1px);
-      background-size: 60px 60px;
-      mask-image: radial-gradient(ellipse 60% 60% at 50% 50%, black, transparent);
-      opacity: 0.4;
-      z-index: 0;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.5;
+      animation: drift 20s ease-in-out infinite;
+    }
+    .orb-1 { width: 500px; height: 500px; background: oklch(0.75 0.1 45); top: -10%; left: -10%; animation-delay: 0s; }
+    .orb-2 { width: 400px; height: 400px; background: oklch(0.78 0.08 220); bottom: -5%; right: -5%; animation-delay: -7s; }
+    .orb-3 { width: 300px; height: 300px; background: oklch(0.85 0.06 160); top: 40%; left: 60%; animation-delay: -14s; opacity: 0.35; }
+
+    @keyframes drift {
+      0%, 100% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -30px) scale(1.08); }
+      66% { transform: translate(-20px, 20px) scale(0.95); }
     }
 
     .hero-content {
       position: relative;
       z-index: 2;
-      max-width: 760px;
-      animation: fadeInUp 1s ease-out both;
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 4rem;
+      align-items: center;
     }
 
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(30px); }
-      to { opacity: 1; transform: translateY(0); }
+    .hero-left {
+      animation: fadeUp 1s ease-out 0.2s both;
     }
 
     .hero-eyebrow {
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.2em;
       text-transform: uppercase;
-      color: var(--accent-primary);
-      margin-bottom: 1.25rem;
-      animation: fadeInUp 0.8s ease-out 0.1s both;
+      color: var(--accent);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      width: 32px;
+      height: 1px;
+      background: var(--accent);
     }
 
     .hero-name {
-      font-size: clamp(2.8rem, 6vw, 4.5rem);
+      font-size: clamp(2.5rem, 5vw, 4rem);
       font-weight: 800;
-      color: var(--text-primary);
-      line-height: 1.1;
+      line-height: 1.05;
+      letter-spacing: -0.03em;
       margin-bottom: 0.75rem;
-      letter-spacing: -0.02em;
-      animation: fadeInUp 0.8s ease-out 0.2s both;
     }
-
     .hero-name span {
-      background: linear-gradient(135deg, var(--accent-primary), var(--prestige-gold));
+      background: linear-gradient(135deg, var(--accent), oklch(0.55 0.12 220));
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
     }
 
     .hero-role {
-      font-size: clamp(1.1rem, 2.5vw, 1.4rem);
+      font-size: 1.25rem;
       font-weight: 500;
-      color: var(--text-secondary);
+      color: var(--text-soft);
       margin-bottom: 1.5rem;
-      animation: fadeInUp 0.8s ease-out 0.3s both;
     }
 
-    .hero-tagline {
-      font-size: clamp(1rem, 2vw, 1.15rem);
+    .hero-bio {
+      font-size: 1rem;
       color: var(--text-muted);
+      max-width: 480px;
       line-height: 1.7;
-      max-width: 560px;
-      margin: 0 auto 2.5rem;
-      animation: fadeInUp 0.8s ease-out 0.4s both;
+      margin-bottom: 2.5rem;
     }
 
-    .hero-cta {
+    .hero-actions {
       display: flex;
-      flex-wrap: wrap;
       gap: 1rem;
-      justify-content: center;
-      animation: fadeInUp 0.8s ease-out 0.5s both;
+      flex-wrap: wrap;
     }
 
     .btn {
@@ -146,632 +148,661 @@
       align-items: center;
       gap: 0.5rem;
       padding: 0.9rem 2rem;
-      border-radius: var(--radius-sm);
+      border-radius: 100px;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       text-decoration: none;
       transition: all 0.3s ease;
       cursor: pointer;
       border: none;
+      font-family: var(--font);
     }
-
     .btn-primary {
-      background: linear-gradient(135deg, var(--accent-primary), oklch(0.45 0.13 40));
-      color: white;
-      box-shadow: 0 4px 20px oklch(0.5 0.15 45 / 0.25);
+      background: var(--text);
+      color: var(--bg);
+      box-shadow: 0 4px 16px oklch(0 0 0 / 0.12);
     }
-
     .btn-primary:hover {
       transform: translateY(-2px);
-      box-shadow: 0 8px 30px oklch(0.5 0.15 45 / 0.35);
+      box-shadow: 0 8px 28px oklch(0 0 0 / 0.18);
     }
-
-    .btn-secondary {
-      background: white;
-      color: var(--text-primary);
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
       border: 1.5px solid var(--border);
-      box-shadow: 0 2px 10px oklch(0 0 0 / 0.04);
     }
-
-    .btn-secondary:hover {
-      border-color: var(--accent-primary);
-      color: var(--accent-primary);
+    .btn-ghost:hover {
+      border-color: var(--accent);
+      color: var(--accent);
       transform: translateY(-2px);
-      box-shadow: 0 4px 16px oklch(0 0 0 / 0.08);
     }
 
-    .scroll-hint {
-      position: absolute;
-      bottom: 2rem;
-      left: 50%;
-      transform: translateX(-50%);
+    /* Portrait frame */
+    .hero-right {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 0.5rem;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      animation: fadeInUp 0.8s ease-out 1s both;
+      justify-content: center;
+      animation: fadeUp 1s ease-out 0.4s both;
     }
 
-    .scroll-hint i { animation: bounce 2s infinite; }
-    @keyframes bounce {
-      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-      40% { transform: translateY(6px); }
-      60% { transform: translateY(3px); }
-    }
-
-    /* ===== NAV ===== */
-    .nav {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 100;
-      padding: 1rem 2rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      background: oklch(0.985 0.015 50 / 0.8);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid var(--border-light);
-      transition: all 0.3s ease;
-    }
-
-    .nav-brand {
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--text-primary);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-
-    .nav-brand .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: var(--accent-primary);
-    }
-
-    .nav-links {
-      display: flex;
-      gap: 2rem;
-      align-items: center;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      color: var(--text-muted);
-      font-weight: 500;
-      font-size: 0.9rem;
-      transition: color 0.2s;
-    }
-
-    .nav-links a:hover { color: var(--accent-primary); }
-
-    .nav-cta {
-      background: var(--accent-primary);
-      color: white !important;
-      padding: 0.5rem 1.2rem;
-      border-radius: var(--radius-sm);
-      font-size: 0.85rem !important;
-      font-weight: 600;
-    }
-
-    /* ===== STATS ===== */
-    .stats {
-      padding: 5rem 2rem;
-      background: var(--bg-secondary);
+    .portrait-frame {
       position: relative;
+      width: 380px;
+      height: 460px;
     }
 
-    .stats-grid {
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 2rem;
-      text-align: center;
+    .portrait-frame img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 24px;
+      position: relative;
+      z-index: 2;
+      box-shadow: 0 20px 60px oklch(0 0 0 / 0.15);
     }
 
-    .stat-item {
-      padding: 1.5rem;
-      animation: fadeInUp 0.6s ease-out both;
+    .portrait-deco {
+      position: absolute;
+      border-radius: 24px;
+      z-index: 1;
+    }
+    .deco-1 {
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, oklch(0.7 0.08 45 / 0.3), oklch(0.75 0.06 220 / 0.25));
+      top: 16px;
+      left: 16px;
+    }
+    .deco-2 {
+      width: 120px;
+      height: 120px;
+      border: 2px solid var(--accent);
+      bottom: -20px;
+      right: -20px;
+      animation: spin-slow 30s linear infinite;
+    }
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
     }
 
-    .stat-item:nth-child(1) { animation-delay: 0.1s; }
-    .stat-item:nth-child(2) { animation-delay: 0.2s; }
-    .stat-item:nth-child(3) { animation-delay: 0.3s; }
-    .stat-item:nth-child(4) { animation-delay: 0.4s; }
-
-    .stat-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      background: linear-gradient(135deg, var(--accent-primary), var(--prestige-gold));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
+    /* Floating badge */
+    .float-badge {
+      position: absolute;
+      bottom: 60px;
+      left: -30px;
+      background: var(--glass);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1rem 1.25rem;
+      z-index: 3;
+      animation: floatBadge 4s ease-in-out infinite;
+      box-shadow: 0 4px 20px oklch(0 0 0 / 0.08);
+    }
+    @keyframes floatBadge {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-8px); }
+    }
+    .float-badge .badge-num {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--accent);
       line-height: 1;
-      margin-bottom: 0.5rem;
     }
-
-    .stat-label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-    }
-
-    /* ===== ABOUT ===== */
-    .about {
-      padding: 6rem 2rem;
-      max-width: 720px;
-      margin: 0 auto;
-      text-align: center;
-    }
-
-    .section-eyebrow {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      color: var(--accent-primary);
-      margin-bottom: 1rem;
-    }
-
-    .section-title {
-      font-size: clamp(1.8rem, 4vw, 2.4rem);
-      font-weight: 700;
-      color: var(--text-primary);
-      margin-bottom: 1.5rem;
-      line-height: 1.2;
-    }
-
-    .about-text {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      line-height: 1.8;
-      margin-bottom: 2rem;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.75rem;
-      justify-content: center;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.4rem;
-      padding: 0.5rem 1rem;
-      background: var(--bg-secondary);
-      border: 1px solid var(--border-light);
-      border-radius: 100px;
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: var(--text-secondary);
-    }
-
-    .badge i { width: 16px; height: 16px; color: var(--accent-primary); }
-
-    /* ===== EXPERIENCE PREVIEW ===== */
-    .experience {
-      padding: 5rem 2rem;
-      background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
-    }
-
-    .experience-header {
-      text-align: center;
-      margin-bottom: 3rem;
-    }
-
-    .experience-grid {
-      max-width: 900px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1.25rem;
-    }
-
-    .exp-card {
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius);
-      padding: 1.75rem;
-      transition: all 0.3s ease;
-      position: relative;
-      overflow: hidden;
-    }
-
-    .exp-card::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, var(--accent-primary), var(--prestige-gold));
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-
-    .exp-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 40px oklch(0 0 0 / 0.08);
-    }
-
-    .exp-card:hover::before { opacity: 1; }
-
-    .exp-org {
-      font-weight: 700;
-      font-size: 1.05rem;
-      color: var(--text-primary);
-      margin-bottom: 0.25rem;
-    }
-
-    .exp-role {
-      font-size: 0.9rem;
-      color: var(--accent-primary);
-      font-weight: 600;
-      margin-bottom: 0.5rem;
-    }
-
-    .exp-meta {
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      display: flex;
-      gap: 0.75rem;
-      align-items: center;
-    }
-
-    .exp-type {
-      padding: 0.2rem 0.6rem;
-      border-radius: 100px;
-      font-size: 0.7rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-    }
-
-    .exp-type.govt { background: oklch(0.92 0.02 220); color: oklch(0.4 0.08 220); }
-    .exp-type.private { background: oklch(0.92 0.02 320); color: oklch(0.4 0.08 320); }
-    .exp-type.startup { background: oklch(0.93 0.02 160); color: oklch(0.4 0.08 160); }
-
-    /* ===== SKILLS ===== */
-    .skills {
-      padding: 5rem 2rem;
-      background: var(--bg-secondary);
-    }
-
-    .skills-header { text-align: center; margin-bottom: 3rem; }
-
-    .skills-grid {
-      max-width: 800px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-      gap: 1rem;
-    }
-
-    .skill-item {
-      background: white;
-      border: 1px solid var(--border-light);
-      border-radius: var(--radius-sm);
-      padding: 1.25rem 1rem;
-      text-align: center;
-      transition: all 0.3s ease;
-    }
-
-    .skill-item:hover {
-      border-color: var(--accent-primary);
-      transform: translateY(-3px);
-      box-shadow: 0 8px 24px oklch(0 0 0 / 0.06);
-    }
-
-    .skill-icon {
-      width: 40px;
-      height: 40px;
-      margin: 0 auto 0.75rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: var(--radius-sm);
-      background: oklch(0.95 0.02 45);
-      color: var(--accent-primary);
-    }
-
-    .skill-icon i { width: 20px; height: 20px; }
-
-    .skill-name {
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: var(--text-primary);
-    }
-
-    .skill-desc {
+    .float-badge .badge-label {
       font-size: 0.75rem;
       color: var(--text-muted);
       margin-top: 0.25rem;
     }
 
-    /* ===== CTA FOOTER ===== */
-    .cta-footer {
-      padding: 6rem 2rem;
+    /* === STATS BAR === */
+    .stats-bar {
+      background: var(--text);
+      color: oklch(0.95 0 0);
+      padding: 2.5rem 2rem;
+    }
+    .stats-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2rem;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+    }
+    .stat-item .stat-num {
+      font-size: 2.5rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, oklch(0.85 0.08 45), oklch(0.82 0.06 220));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      line-height: 1;
+    }
+    .stat-item .stat-label {
+      font-size: 0.8rem;
+      opacity: 0.7;
+      margin-top: 0.5rem;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
     }
 
-    .cta-footer-bg {
-      position: absolute;
-      inset: 0;
-      background:
-        radial-gradient(ellipse 60% 50% at 50% 100%, oklch(0.7 0.12 45 / 0.1) 0%, transparent 60%),
-        radial-gradient(ellipse 40% 40% at 20% 0%, oklch(0.65 0.1 220 / 0.06) 0%, transparent 50%);
-      z-index: 0;
-    }
-
-    .cta-footer-content {
-      position: relative;
-      z-index: 1;
-      max-width: 560px;
+    /* === SECTIONS === */
+    section {
+      padding: 6rem 2rem;
+      max-width: 1100px;
       margin: 0 auto;
     }
 
-    .cta-title {
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
+    .section-header {
+      margin-bottom: 3rem;
+    }
+    .section-tag {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 0.75rem;
+    }
+    .section-title {
+      font-size: clamp(1.75rem, 3vw, 2.5rem);
       font-weight: 700;
-      color: var(--text-primary);
+      letter-spacing: -0.02em;
+      line-height: 1.2;
+    }
+
+    /* === ABOUT TEASER === */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 3rem;
+      align-items: center;
+    }
+    .about-visual {
+      position: relative;
+      border-radius: 20px;
+      overflow: hidden;
+      aspect-ratio: 16/10;
+    }
+    .about-visual img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .about-visual:hover img {
+      transform: scale(1.03);
+    }
+    .about-visual::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, oklch(0.2 0.02 50 / 0.6) 0%, transparent 50%);
+    }
+    .about-text p {
+      font-size: 1.05rem;
+      color: var(--text-soft);
+      line-height: 1.8;
+      margin-bottom: 1.25rem;
+    }
+    .about-text p em {
+      color: var(--accent);
+      font-style: normal;
+      font-weight: 600;
+    }
+    .about-text p strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    /* === SKILLS SHOWCASE === */
+    .skills-section {
+      background: var(--bg-warm);
+      position: relative;
+      overflow: hidden;
+    }
+    .skills-section::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -20%;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, oklch(0.8 0.06 45 / 0.15) 0%, transparent 70%);
+      pointer-events: none;
+    }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .skill-block {
+      background: oklch(1 0 0 / 0.7);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+    }
+    .skill-block:hover {
+      transform: translateY(-4px);
+      border-color: var(--accent-light);
+      box-shadow: 0 12px 32px oklch(0 0 0 / 0.08);
+    }
+    .skill-block h4 {
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    .skill-block ul {
+      list-style: none;
+    }
+    .skill-block li {
+      font-size: 0.95rem;
+      color: var(--text-soft);
+      padding: 0.35rem 0;
+      border-bottom: 1px solid oklch(0.9 0.01 50 / 0.5);
+    }
+    .skill-block li:last-child { border-bottom: none; }
+
+    /* === EXPERIENCE PREVIEW === */
+    .exp-preview {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+    }
+    .exp-card {
+      background: oklch(1 0 0 / 0.8);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .exp-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, var(--accent), oklch(0.55 0.1 220));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.4s ease;
+    }
+    .exp-card:hover::before {
+      transform: scaleX(1);
+    }
+    .exp-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 16px 40px oklch(0 0 0 / 0.1);
+    }
+    .exp-card .exp-date {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--accent);
+      margin-bottom: 0.5rem;
+    }
+    .exp-card .exp-role {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    .exp-card .exp-org {
+      font-size: 0.9rem;
+      color: var(--text-muted);
       margin-bottom: 1rem;
     }
-
-    .cta-text {
-      font-size: 1.05rem;
-      color: var(--text-secondary);
-      margin-bottom: 2rem;
-      line-height: 1.7;
+    .exp-card .exp-badge {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.3rem 0.6rem;
+      border-radius: 4px;
+      background: oklch(0.9 0.08 55 / 0.5);
+      color: oklch(0.4 0.1 45);
     }
 
-    /* ===== FOOTER ===== */
-    .footer {
-      padding: 2rem;
-      text-align: center;
-      border-top: 1px solid var(--border-light);
+    /* === VISUAL SHOWCASE === */
+    .showcase-section {
+      background: var(--text);
+      color: oklch(0.95 0 0);
+      position: relative;
+      overflow: hidden;
+    }
+    .showcase-section::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 50% at 30% 70%, oklch(0.35 0.08 45 / 0.4) 0%, transparent 60%),
+        radial-gradient(ellipse 50% 40% at 80% 20%, oklch(0.3 0.06 220 / 0.3) 0%, transparent 50%);
+    }
+    .showcase-section .section-tag { color: oklch(0.85 0.08 45); }
+    .showcase-section .section-title { color: oklch(1 0 0); }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      position: relative;
+      z-index: 2;
+    }
+    .showcase-item {
+      border-radius: 20px;
+      overflow: hidden;
+      position: relative;
+      aspect-ratio: 16/10;
+    }
+    .showcase-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.6s ease;
+    }
+    .showcase-item:hover img {
+      transform: scale(1.05);
+    }
+    .showcase-item::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, oklch(0.1 0 0 / 0.7) 0%, transparent 60%);
+    }
+    .showcase-caption {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 1.5rem;
+      z-index: 2;
+    }
+    .showcase-caption h4 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+    .showcase-caption p {
       font-size: 0.85rem;
+      opacity: 0.7;
+    }
+
+    /* === CTA === */
+    .cta-section {
+      text-align: center;
+      padding: 6rem 2rem;
+    }
+    .cta-section h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 800;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+    .cta-section p {
       color: var(--text-muted);
+      max-width: 500px;
+      margin: 0 auto 2rem;
+      font-size: 1.1rem;
     }
 
-    .footer a { color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
-    .footer a:hover { color: var(--accent-primary); }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 768px) {
-      .nav-links { display: none; }
-      .hero { padding: 5rem 1.5rem 3rem; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
-      .experience-grid { grid-template-columns: 1fr; }
-      .skills-grid { grid-template-columns: repeat(2, 1fr); }
+    /* === FOOTER === */
+    footer {
+      text-align: center;
+      padding: 2.5rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 0.85rem;
     }
 
-    /* Intersection Observer animation */
+    /* === ANIMATIONS === */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
     .reveal {
       opacity: 0;
-      transform: translateY(24px);
-      transition: opacity 0.6s ease, transform 0.6s ease;
+      transform: translateY(30px);
+      transition: all 0.8s ease-out;
     }
-
     .reveal.visible {
       opacity: 1;
       transform: translateY(0);
+    }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 900px) {
+      .hero-content { grid-template-columns: 1fr; text-align: center; gap: 3rem; }
+      .hero-left { order: 2; }
+      .hero-right { order: 1; }
+      .hero-actions { justify-content: center; }
+      .portrait-frame { width: 280px; height: 340px; }
+      .float-badge { left: -10px; bottom: 40px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .about-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .exp-preview { grid-template-columns: 1fr; }
+      .showcase-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <nav class="nav">
-    <a href="#" class="nav-brand"><span class="dot"></span>Sam Chu</a>
-    <div class="nav-links">
-      <a href="#about">About</a>
-      <a href="#experience">Experience</a>
-      <a href="#skills">Skills</a>
-      <a href="resume.html" class="nav-cta">Full Resume →</a>
-    </div>
-  </nav>
-
-  <!-- Hero -->
+  <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
-    <div class="hero-grid"></div>
+    <div class="hero-orb orb-1"></div>
+    <div class="hero-orb orb-2"></div>
+    <div class="hero-orb orb-3"></div>
+
     <div class="hero-content">
-      <p class="hero-eyebrow">👋 Welcome</p>
-      <h1 class="hero-name">I'm <span>Sam Chu</span></h1>
-      <p class="hero-role">Senior CT Radiographer · AHPC Registered · Singapore</p>
-      <p class="hero-tagline">
-        11+ years of clinical excellence across world-class hospitals and cutting-edge healthcare startups.
-        From setup to scan — delivering precision imaging with compassionate patient care.
-      </p>
-      <div class="hero-cta">
-        <a href="resume.html" class="btn btn-primary">
-          <i data-lucide="file-text"></i> View Full Resume
+      <div class="hero-left">
+        <div class="hero-eyebrow">Senior CT Radiographer</div>
+        <h1 class="hero-name">
+          Sam<br>
+          <span>Chu</span>
+        </h1>
+        <p class="hero-role">Transforming Diagnostic Imaging</p>
+        <p class="hero-bio">
+          11+ years of clinical excellence across world-class hospitals and innovative healthcare startups. From setup to scan — building imaging services from the ground up.
+        </p>
+        <div class="hero-actions">
+          <a href="resume.html" class="btn btn-primary">
+            <i data-lucide="file-text" width="16" height="16"></i>
+            View Full Resume
+          </a>
+          <a href="index2.html" class="btn btn-ghost">
+            <i data-lucide="play" width="16" height="16"></i>
+            Video Portfolio
+          </a>
+        </div>
+      </div>
+
+      <div class="hero-right">
+        <div class="portrait-frame">
+          <div class="portrait-deco deco-1"></div>
+          <img src="images/hero-portrait.jpg" alt="Sam Chu - Senior CT Radiographer">
+          <div class="portrait-deco deco-2"></div>
+          <div class="float-badge">
+            <div class="badge-num">11+</div>
+            <div class="badge-label">Years Experience</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <div class="stats-bar">
+    <div class="stats-inner">
+      <div class="stat-item">
+        <div class="stat-num">11+</div>
+        <div class="stat-label">Years Clinical</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">3</div>
+        <div class="stat-label">Founding Teams</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">6</div>
+        <div class="stat-label">Institutions</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">SG</div>
+        <div class="stat-label">AHPC Licensed</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ABOUT TEASER -->
+  <section>
+    <div class="about-grid reveal">
+      <div class="about-visual">
+        <img src="images/ct-machine.jpg" alt="CT Scanner">
+      </div>
+      <div class="about-text">
+        <div class="section-tag">About</div>
+        <h2 class="section-title" style="margin-bottom: 1.5rem;">More Than Just Scans</h2>
+        <p>
+          With a strong foundation in <strong>radiation physics</strong> and <strong>human physiology</strong>, I don't just follow protocols — I understand <span class="accent-text">why</span> each decision matters. This allows me to optimize every scan for the perfect balance of diagnostic quality and patient safety.
+        </p>
+        <p>
+          I've been part of <strong>three founding teams</strong> launching new imaging services from the ground up — navigating licensing, building workflows, and configuring systems that set the standard for operational excellence.
+        </p>
+        <a href="resume.html#about" class="btn btn-ghost" style="margin-top: 0.5rem;">
+          Read More <i data-lucide="arrow-right" width="14" height="14"></i>
         </a>
-        <a href="#about" class="btn btn-secondary">
-          <i data-lucide="user"></i> About Me
-        </a>
-      </div>
-    </div>
-    <div class="scroll-hint">
-      <span>Scroll to explore</span>
-      <i data-lucide="chevron-down"></i>
-    </div>
-  </section>
-
-  <!-- Stats -->
-  <section class="stats">
-    <div class="stats-grid">
-      <div class="stat-item">
-        <div class="stat-number">11+</div>
-        <div class="stat-label">Years Experience</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">4</div>
-        <div class="stat-label">Hospitals</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">AHPC</div>
-        <div class="stat-label">Registered</div>
-      </div>
-      <div class="stat-item">
-        <div class="stat-number">SG</div>
-        <div class="stat-label">Based in Singapore</div>
       </div>
     </div>
   </section>
 
-  <!-- About -->
-  <section class="about" id="about">
-    <p class="section-eyebrow reveal">About Me</p>
-    <h2 class="section-title reveal">Precision Imaging. Compassionate Care.</h2>
-    <p class="about-text reveal">
-      With over 11 years of experience spanning world-class public hospitals, premium private facilities,
-      and cutting-edge wellness startups, I've dedicated my career to mastering the art and science of
-      diagnostic imaging. From leading CT section operations at Singapore's largest public hospital to
-      pioneering imaging protocols at a longevity startup, I bring clinical excellence and innovation to every scan.
-    </p>
-    <div class="badges reveal">
-      <span class="badge"><i data-lucide="shield-check"></i> AHPC Registered</span>
-      <span class="badge"><i data-lucide="graduation-cap"></i> BSc Radiography</span>
-      <span class="badge"><i data-lucide="heart-pulse"></i> BCLS Certified</span>
-      <span class="badge"><i data-lucide="globe"></i> Mandarin · English</span>
-      <span class="badge"><i data-lucide="map-pin"></i> Singapore PR</span>
+  <!-- SKILLS -->
+  <section class="skills-section">
+    <div class="section-header reveal">
+      <div class="section-tag">Expertise</div>
+      <h2 class="section-title">Clinical & Technical Skills</h2>
+    </div>
+    <div class="skills-grid reveal">
+      <div class="skill-block">
+        <h4>Clinical Excellence</h4>
+        <ul>
+          <li>CT Imaging & Protocols</li>
+          <li>General Radiography</li>
+          <li>CTCA Workflow</li>
+          <li>Dose Monitoring & QA</li>
+          <li>Imaging-Guided Procedures</li>
+        </ul>
+      </div>
+      <div class="skill-block">
+        <h4>Technical Infrastructure</h4>
+        <ul>
+          <li>PACS Setup & Integration</li>
+          <li>Teleradiology Networks</li>
+          <li>Cloud Storage Config</li>
+          <li>Equipment Installation</li>
+          <li>AI Tools Integration</li>
+        </ul>
+      </div>
+      <div class="skill-block">
+        <h4>Operations & Leadership</h4>
+        <ul>
+          <li>MOH / HCSA Compliance</li>
+          <li>Radiological Licensing</li>
+          <li>Workflow Design</li>
+          <li>Team Leadership</li>
+          <li>QA Manual Development</li>
+        </ul>
+      </div>
     </div>
   </section>
 
-  <!-- Experience Preview -->
-  <section class="experience" id="experience">
-    <div class="experience-header reveal">
-      <p class="section-eyebrow">Career Highlights</p>
-      <h2 class="section-title">Trusted by Leading Healthcare Institutions</h2>
+  <!-- EXPERIENCE PREVIEW -->
+  <section>
+    <div class="section-header reveal">
+      <div class="section-tag">Career</div>
+      <h2 class="section-title">Recent Experience</h2>
     </div>
-    <div class="experience-grid">
-      <div class="exp-card reveal">
-        <div class="exp-type startup">Startup</div>
-        <div class="exp-org">Radbit / Longevity Startup</div>
+    <div class="exp-preview reveal">
+      <div class="exp-card">
+        <div class="exp-date">2025 — Present</div>
         <div class="exp-role">Radiographer / Section Leader</div>
-        <div class="exp-meta">
-          <i data-lucide="calendar" style="width:14px;height:14px"></i> 2024 – Present
-        </div>
+        <div class="exp-org">Morrow Medical by Seveno Capital</div>
+        <span class="exp-badge">Founding Team</span>
       </div>
-
-      <div class="exp-card reveal">
-        <div class="exp-type govt">Public</div>
-        <div class="exp-org">National University Hospital</div>
-        <div class="exp-role">Senior Radiographer / CT Section Leader</div>
-        <div class="exp-meta">
-          <i data-lucide="calendar" style="width:14px;height:14px"></i> 2017 – 2024
-        </div>
+      <div class="exp-card">
+        <div class="exp-date">2023 — 2025</div>
+        <div class="exp-role">Senior Radiographer / CT Lead</div>
+        <div class="exp-org">DA Medsuites by Doctor Anywhere</div>
+        <span class="exp-badge">Founding Team</span>
       </div>
-
-      <div class="exp-card reveal">
-        <div class="exp-type govt">Public</div>
-        <div class="exp-org">Singapore General Hospital</div>
-        <div class="exp-role">Senior Radiographer</div>
-        <div class="exp-meta">
-          <i data-lucide="calendar" style="width:14px;height:14px"></i> 2015 – 2017
-        </div>
-      </div>
-
-      <div class="exp-card reveal">
-        <div class="exp-type private">Private</div>
-        <div class="exp-org">Mount Elizabeth Hospital</div>
-        <div class="exp-role">Radiographer</div>
-        <div class="exp-meta">
-          <i data-lucide="calendar" style="width:14px;height:14px"></i> 2013 – 2015
-        </div>
+      <div class="exp-card">
+        <div class="exp-date">2022 — 2023</div>
+        <div class="exp-role">Senior Radiographer / CT Lead</div>
+        <div class="exp-org">Early Medical Centre by MiRXES</div>
+        <span class="exp-badge">Founding Team</span>
       </div>
     </div>
-  </section>
-
-  <!-- Skills -->
-  <section class="skills" id="skills">
-    <div class="skills-header reveal">
-      <p class="section-eyebrow">Expertise</p>
-      <h2 class="section-title">Core Competencies</h2>
-    </div>
-    <div class="skills-grid">
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="scan"></i></div>
-        <div class="skill-name">CT Imaging</div>
-        <div class="skill-desc">Advanced protocols</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="magnet"></i></div>
-        <div class="skill-name">MRI</div>
-        <div class="skill-desc">Multi-sequence scans</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="activity"></i></div>
-        <div class="skill-name">X-Ray</div>
-        <div class="skill-desc">General & specialized</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="bone"></i></div>
-        <div class="skill-name">DEXA</div>
-        <div class="skill-desc">Bone density</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="settings"></i></div>
-        <div class="skill-name">QA / QC</div>
-        <div class="skill-desc">Equipment standards</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="users"></i></div>
-        <div class="skill-name">Team Lead</div>
-        <div class="skill-desc">Section leadership</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="layout-template"></i></div>
-        <div class="skill-name">PACS / RIS</div>
-        <div class="skill-desc">Workflow optimization</div>
-      </div>
-      <div class="skill-item reveal">
-        <div class="skill-icon"><i data-lucide="lightbulb"></i></div>
-        <div class="skill-name">Protocol Dev</div>
-        <div class="skill-desc">Custom sequences</div>
-      </div>
-    </div>
-  </section>
-
-  <!-- CTA Footer -->
-  <section class="cta-footer">
-    <div class="cta-footer-bg"></div>
-    <div class="cta-footer-content">
-      <h2 class="cta-title">Ready to see the full picture?</h2>
-      <p class="cta-text">
-        Explore my complete professional journey, detailed projects,
-        certifications, and downloadable resume.
-      </p>
-      <a href="resume.html" class="btn btn-primary" style="font-size:1.05rem;padding:1rem 2.5rem">
-        <i data-lucide="file-text"></i> View Complete Resume
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href="resume.html#experience" class="btn btn-ghost">
+        View Full Timeline <i data-lucide="arrow-right" width="14" height="14"></i>
       </a>
     </div>
   </section>
 
-  <!-- Footer -->
-  <footer class="footer">
-    <p>© 2026 Sam Chu · Built with care ·
-    <a href="resume.html">Full Resume</a> ·
-    <a href="mailto:chuchu@example.com">Contact</a></p>
+  <!-- VISUAL SHOWCASE -->
+  <section class="showcase-section">
+    <div class="section-header reveal">
+      <div class="section-tag">Showcase</div>
+      <h2 class="section-title">Projects & Systems</h2>
+    </div>
+    <div class="showcase-grid reveal">
+      <div class="showcase-item">
+        <img src="images/showcase-1.jpg" alt="CT Protocol Optimization">
+        <div class="showcase-caption">
+          <h4>CT Protocol Optimization</h4>
+          <p>Dose-reduced protocols for vulnerable populations</p>
+        </div>
+      </div>
+      <div class="showcase-item">
+        <img src="images/showcase-2.jpg" alt="PACS & Infrastructure">
+        <div class="showcase-caption">
+          <h4>PACS & Teleradiology</h4>
+          <p>Cloud-based imaging infrastructure setup</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-section reveal">
+    <h2>Let's Work Together</h2>
+    <p>Whether you're building a new imaging service or need an experienced radiographer — I'd love to connect.</p>
+    <div class="hero-actions" style="justify-content: center;">
+      <a href="mailto:samchuchu.sg@gmail.com" class="btn btn-primary">
+        <i data-lucide="mail" width="16" height="16"></i>
+        Get in Touch
+      </a>
+      <a href="https://linkedin.com/in/samchuchu" class="btn btn-ghost" target="_blank">
+        <i data-lucide="linkedin" width="16" height="16"></i>
+        LinkedIn
+      </a>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>&copy; 2026 Sam Chu. All rights reserved.</p>
   </footer>
 
   <script>
-    // Initialize Lucide icons
+    // Init icons
     lucide.createIcons();
 
     // Scroll reveal
@@ -782,19 +813,19 @@
           entry.target.classList.add('visible');
         }
       });
-    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+    }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
     reveals.forEach(el => observer.observe(el));
 
-    // Nav background on scroll
-    const nav = document.querySelector('.nav');
-    window.addEventListener('scroll', () => {
-      if (window.scrollY > 50) {
-        nav.style.boxShadow = '0 2px 20px oklch(0 0 0 / 0.06)';
-      } else {
-        nav.style.boxShadow = 'none';
-      }
+    // Parallax on hero orbs
+    document.addEventListener('mousemove', (e) => {
+      const orbs = document.querySelectorAll('.hero-orb');
+      const x = (e.clientX / window.innerWidth - 0.5) * 2;
+      const y = (e.clientY / window.innerHeight - 0.5) * 2;
+      orbs.forEach((orb, i) => {
+        const factor = (i + 1) * 15;
+        orb.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
+      });
     });
   </script>
-
 </body>
 </html>
