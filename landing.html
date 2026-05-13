@@ -8,6 +8,20 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- Meta / OG -->
+  <meta name="description" content="Sam Chu — Senior CT Radiographer with 11+ years of clinical excellence across world-class hospitals and healthcare startups.">
+  <meta property="og:title" content="Sam Chu | Senior CT Radiographer">
+  <meta property="og:description" content="11+ years of clinical excellence. From setup to scan — building imaging services from the ground up.">
+  <meta property="og:image" content="https://samchuchu.github.io/samchu/images/hero-portrait.jpg">
+  <meta property="og:url" content="https://samchuchu.github.io/samchu/landing.html">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- GoatCounter -->
+  <script data-goatcounter="https://samchuchu.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+
   <style>
     :root {
       --bg: oklch(0.985 0.01 60);
@@ -34,6 +48,62 @@
       color: var(--text);
       line-height: 1.6;
       overflow-x: hidden;
+    }
+
+    /* === STICKY NAV === */
+    .sticky-nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      background: oklch(0.98 0.01 60 / 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 0.75rem 2rem;
+      transform: translateY(-100%);
+      transition: transform 0.35s ease;
+    }
+    .sticky-nav.visible {
+      transform: translateY(0);
+    }
+    .nav-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .nav-logo {
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--text);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .nav-links a {
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--text-soft);
+      text-decoration: none;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover {
+      color: var(--accent);
+    }
+    .nav-cta {
+      background: var(--text);
+      color: var(--bg) !important;
+      padding: 0.5rem 1rem;
+      border-radius: 100px;
+      font-weight: 600;
+    }
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
     }
 
     /* === HERO === */
@@ -177,6 +247,29 @@
       transform: translateY(-2px);
     }
 
+    /* Scroll indicator */
+    .scroll-indicator {
+      position: absolute;
+      bottom: 2.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      animation: fadeUp 1s ease-out 1.2s both;
+      z-index: 2;
+    }
+    .scroll-indicator svg {
+      animation: bounce 2s infinite;
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(8px); }
+    }
+
     /* Portrait frame */
     .hero-right {
       display: flex;
@@ -194,6 +287,7 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      object-position: top center;
       border-radius: 24px;
       position: relative;
       z-index: 2;
@@ -350,10 +444,18 @@
       font-style: normal;
       font-weight: 600;
     }
+    .accent-text {
+      color: var(--accent);
+      font-weight: 600;
+    }
     .about-text p strong {
       color: var(--text);
       font-weight: 600;
     }
+
+    .portrait-frame { background: var(--bg-warm); }
+    .about-visual { background: oklch(0.2 0.02 50 / 0.4); }
+    .showcase-item { background: oklch(0.15 0 0); }
 
     /* === SKILLS SHOWCASE === */
     .skills-section {
@@ -552,6 +654,36 @@
       font-size: 1.1rem;
     }
 
+    /* === BACK TO TOP === */
+    .back-to-top {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--text);
+      color: var(--bg);
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.3s ease;
+      z-index: 99;
+      box-shadow: 0 4px 16px oklch(0 0 0 / 0.15);
+    }
+    .back-to-top.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .back-to-top:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px oklch(0 0 0 / 0.2);
+    }
+
     /* === FOOTER === */
     footer {
       text-align: center;
@@ -595,12 +727,31 @@
 </head>
 <body>
 
+  <!-- STICKY NAV -->
+  <nav class="sticky-nav" id="stickyNav">
+    <div class="nav-inner">
+      <a href="#" class="nav-logo">Sam Chu</a>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#skills">Skills</a>
+        <a href="#experience">Experience</a>
+        <a href="#showcase">Showcase</a>
+        <a href="#contact" class="nav-cta">Contact</a>
+      </div>
+    </div>
+  </nav>
+
   <!-- HERO -->
   <section class="hero">
     <div class="hero-bg"></div>
     <div class="hero-orb orb-1"></div>
     <div class="hero-orb orb-2"></div>
     <div class="hero-orb orb-3"></div>
+
+    <div class="scroll-indicator" id="scrollIndicator">
+      <span>Scroll to explore</span>
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>
+    </div>
 
     <div class="hero-content">
       <div class="hero-left">
@@ -628,7 +779,7 @@
       <div class="hero-right">
         <div class="portrait-frame">
           <div class="portrait-deco deco-1"></div>
-          <img src="images/hero-portrait.jpg" alt="Sam Chu - Senior CT Radiographer">
+          <img src="images/hero-portrait.jpg" alt="Sam Chu - Senior CT Radiographer" loading="eager" decoding="async" fetchpriority="high">
           <div class="portrait-deco deco-2"></div>
           <div class="float-badge">
             <div class="badge-num">11+</div>
@@ -655,17 +806,17 @@
         <div class="stat-label">Institutions</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num">SG</div>
-        <div class="stat-label">AHPC Licensed</div>
+        <div class="stat-num">1</div>
+        <div class="stat-label">Country Licensed</div>
       </div>
     </div>
   </div>
 
   <!-- ABOUT TEASER -->
-  <section>
+  <section id="about">
     <div class="about-grid reveal">
       <div class="about-visual">
-        <img src="images/ct-machine.jpg" alt="CT Scanner">
+        <img src="images/ct-machine.jpg" alt="CT Scanner" loading="lazy" decoding="async">
       </div>
       <div class="about-text">
         <div class="section-tag">About</div>
@@ -684,7 +835,7 @@
   </section>
 
   <!-- SKILLS -->
-  <section class="skills-section">
+  <section id="skills" class="skills-section">
     <div class="section-header reveal">
       <div class="section-tag">Expertise</div>
       <h2 class="section-title">Clinical & Technical Skills</h2>
@@ -724,7 +875,7 @@
   </section>
 
   <!-- EXPERIENCE PREVIEW -->
-  <section>
+  <section id="experience">
     <div class="section-header reveal">
       <div class="section-tag">Career</div>
       <h2 class="section-title">Recent Experience</h2>
@@ -757,21 +908,21 @@
   </section>
 
   <!-- VISUAL SHOWCASE -->
-  <section class="showcase-section">
+  <section id="showcase" class="showcase-section">
     <div class="section-header reveal">
       <div class="section-tag">Showcase</div>
       <h2 class="section-title">Projects & Systems</h2>
     </div>
     <div class="showcase-grid reveal">
       <div class="showcase-item">
-        <img src="images/showcase-1.jpg" alt="CT Protocol Optimization">
+        <img src="images/showcase-1.jpg" alt="CT Protocol Optimization" loading="lazy" decoding="async">
         <div class="showcase-caption">
           <h4>CT Protocol Optimization</h4>
           <p>Dose-reduced protocols for vulnerable populations</p>
         </div>
       </div>
       <div class="showcase-item">
-        <img src="images/showcase-2.jpg" alt="PACS & Infrastructure">
+        <img src="images/showcase-2.jpg" alt="PACS & Infrastructure" loading="lazy" decoding="async">
         <div class="showcase-caption">
           <h4>PACS & Teleradiology</h4>
           <p>Cloud-based imaging infrastructure setup</p>
@@ -781,7 +932,7 @@
   </section>
 
   <!-- CTA -->
-  <section class="cta-section reveal">
+  <section id="contact" class="cta-section reveal">
     <h2>Let's Work Together</h2>
     <p>Whether you're building a new imaging service or need an experienced radiographer — I'd love to connect.</p>
     <div class="hero-actions" style="justify-content: center;">
@@ -795,6 +946,10 @@
       </a>
     </div>
   </section>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="18 15 12 9 6 15"></polyline></svg>
+  </button>
 
   <!-- FOOTER -->
   <footer>
@@ -816,16 +971,33 @@
     }, { threshold: 0.15, rootMargin: '0px 0px -50px 0px' });
     reveals.forEach(el => observer.observe(el));
 
-    // Parallax on hero orbs
-    document.addEventListener('mousemove', (e) => {
-      const orbs = document.querySelectorAll('.hero-orb');
-      const x = (e.clientX / window.innerWidth - 0.5) * 2;
-      const y = (e.clientY / window.innerHeight - 0.5) * 2;
-      orbs.forEach((orb, i) => {
-        const factor = (i + 1) * 15;
-        orb.style.transform = `translate(${x * factor}px, ${y * factor}px)`;
-      });
+    // Sticky nav visibility
+    const stickyNav = document.getElementById('stickyNav');
+    const scrollIndicator = document.getElementById('scrollIndicator');
+    const backToTop = document.getElementById('backToTop');
+    const hero = document.querySelector('.hero');
+
+    const navObserver = new IntersectionObserver(([entry]) => {
+      stickyNav.classList.toggle('visible', !entry.isIntersecting);
+    }, { threshold: 0 });
+    navObserver.observe(hero);
+
+    // Back to top visibility + scroll indicator hide
+    window.addEventListener('scroll', () => {
+      const scrollY = window.scrollY;
+      if (scrollIndicator) {
+        scrollIndicator.style.opacity = scrollY > 100 ? '0' : '1';
+      }
+      if (backToTop) {
+        backToTop.classList.toggle('visible', scrollY > 600);
+      }
     });
+
+    if (backToTop) {
+      backToTop.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
   </script>
 </body>
 </html>
