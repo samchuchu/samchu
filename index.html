@@ -1,0 +1,3363 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Atom</title>
+<style>    * { margin: 0;
+padding: 0;
+box-sizing: border-box;
+}
+html, body { width: 100%;
+height: 100%;
+overflow: hidden;
+background: #07080b;
+font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+}
+canvas#bg-canvas {      position: fixed;
+top: 0;
+left: 0;
+width: 100%;
+height: 100%;
+z-index: 0;
+}
+#atom-svg {      position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%);
+z-index: 5;
+width: min(600px, 85vmin);
+height: min(600px, 85vmin);
+transition: opacity 0.45s ease;
+}
+#atom-svg.experience-dimmed {
+opacity: 0.5;
+}
+.letterbox {      position: fixed;
+left: 0;
+width: 100%;
+background: #000;
+z-index: 20;
+pointer-events: none;
+}
+.letterbox.top    { top: 0;
+}
+.letterbox.bottom { bottom: 0;
+}
+.electron-label {      position: fixed;
+z-index: 10;
+pointer-events: none;
+color: #fff;
+width: 34px;
+min-width: 34px;
+height: 34px;
+border: 1px solid rgba(255,255,255,0.62);
+border-radius: 50%;
+display: grid;
+place-items: center;
+padding: 0;
+font-size: 1.08rem;
+font-weight: 700;
+letter-spacing: 0;
+opacity: 0.72;
+transition: opacity 0.25s ease, width 0.25s ease, border-radius 0.25s ease, padding 0.25s ease;
+background: rgba(8,12,20,0.26);
+box-shadow: 0 0 14px rgba(100,160,255,0.26), inset 0 0 10px rgba(255,255,255,0.12);
+text-shadow: 0 0 10px rgba(100,160,255,0.7), 0 0 3px rgba(255,255,255,0.5);
+white-space: nowrap;
+transform: translate(-50%, -50%);
+}
+.electron-label.show { opacity: 1;
+width: auto;
+padding: 0 12px;
+border-radius: 999px;
+border-color: rgba(255,255,255,0.92);
+box-shadow: 0 0 20px rgba(130,190,255,0.46), inset 0 0 12px rgba(255,255,255,0.18);
+}
+#controls-toggle { display: none !important;
+position: fixed;
+top: 16px;
+right: 16px;
+z-index: 30;
+width: 40px;
+height: 40px;
+border-radius: 8px;
+border: 1px solid rgba(255,255,255,0.15);
+background: rgba(10,10,30,0.85);
+color: #93c5fd;
+cursor: pointer;
+display: none !important;
+visibility: hidden;
+pointer-events: none;
+align-items: center;
+justify-content: center;
+font-size: 1.2rem;
+transition: background 0.2s;
+backdrop-filter: blur(8px);
+}
+#controls-toggle:hover { background: rgba(30,30,60,0.9);
+}
+#controls-panel {      position: fixed;
+display: none !important;
+visibility: hidden;
+pointer-events: none;
+top: 0;
+right: -320px;
+width: 300px;
+height: 100%;
+z-index: 25;
+background: rgba(8,8,24,0.95);
+border-left: 1px solid rgba(255,255,255,0.08);
+backdrop-filter: blur(12px);
+padding: 60px 20px 20px;
+overflow-y: auto;
+transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+color: #cbd5e1;
+}
+#controls-panel.open { right: 0;
+}
+#controls-panel h3 {      font-size: 0.75rem;
+text-transform: uppercase;
+letter-spacing: 0.12em;
+color: #64748b;
+margin: 20px 0 10px;
+padding-bottom: 6px;
+border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+#controls-panel h3:first-child { margin-top: 0;
+}
+.ctrl-row {      display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 8px;
+font-size: 0.82rem;
+}
+.ctrl-row label { color: #94a3b8;
+flex: 1;
+}
+.ctrl-row input[type=range] { width: 120px;
+accent-color: #60a5fa;
+}
+.ctrl-row .val {      width: 36px;
+text-align: right;
+font-variant-numeric: tabular-nums;
+color: #93c5fd;
+font-size: 0.78rem;
+}
+.btn-row { display: flex;
+gap: 8px;
+margin-top: 16px;
+}
+.btn-row button {      flex: 1;
+padding: 8px 0;
+border-radius: 6px;
+border: 1px solid rgba(255,255,255,0.12);
+background: rgba(255,255,255,0.04);
+color: #cbd5e1;
+cursor: pointer;
+font-size: 0.78rem;
+transition: background 0.2s;
+}
+.btn-row button:hover { background: rgba(255,255,255,0.1);
+}
+.btn-row button.primary { background: #2563eb;
+border-color: #2563eb;
+color: #fff;
+}
+.btn-row button.primary:hover { background: #1d4ed8;
+}
+#controls-panel::-webkit-scrollbar { width: 4px;
+}
+@keyframes ring-flash {      0%   { border-color: rgba(255,220,100,0.9);
+transform: scale(1);
+}
+50%  { border-color: rgba(255,220,100,0.9);
+transform: scale(1.12);
+}
+100% { border-color: rgba(255,255,255,0.25);
+transform: scale(1);
+}
+}
+.ring-animate {      animation: ring-flash 0.85s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+@keyframes svg-blink {      0%, 100% { opacity: 1;
+}
+50%      { opacity: 0.15;
+}
+}
+.svg-blink {      animation: svg-blink 0.15s ease;
+}
+#name-ring {      filter: drop-shadow(0 0 8px rgba(255,255,255,0.92)) drop-shadow(0 0 22px rgba(120,180,255,0.72));
+animation: name-ring-shine 3.6s ease-in-out infinite;
+}
+@keyframes name-ring-shine {      0%, 100% { opacity: 0.68;
+}
+45% { opacity: 1;
+}
+58% { opacity: 0.78;
+}
+}
+#controls-panel::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08);
+border-radius: 2px;
+}
+/* ---- Planet session overlay ---- */    #planet-backdrop {      position: fixed;
+inset: 0;
+z-index: 15;
+background: rgba(0,0,0,0.75);
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.5s ease;
+}
+#planet-backdrop.active { opacity: 1;
+pointer-events: auto;
+}
+#planet-backdrop.clear-session-bg {
+background: transparent;
+}
+#planet-backdrop.projects-session-bg {
+background:
+radial-gradient(circle at 18% 20%, rgba(120,180,255,0.18), transparent 30%),
+linear-gradient(90deg, rgba(7,8,11,0.08), rgba(7,8,11,0.42)),
+url('bg4.png') center / cover no-repeat;
+}
+#atom-svg.projects-visible {
+z-index: 21;
+opacity: 0.76;
+mix-blend-mode: screen;
+pointer-events: none;
+}
+#projects-stage {
+position: fixed;
+inset: 0;
+z-index: 22;
+opacity: 0;
+pointer-events: none;
+overflow: hidden;
+transition: opacity 0.8s ease;
+}
+#projects-stage.active {
+opacity: 1;
+pointer-events: auto;
+}
+.projects-card-effect {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+border: 0;
+background: transparent;
+}
+#planet-overlay {      position: fixed;
+top: 0;
+right: 0;
+transform: scale(0);
+transform-origin: top right;
+z-index: 16;
+pointer-events: none;
+transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+}
+#planet-overlay.active { transform: scale(1);
+}
+#planet-overlay img {      display: block;
+width: min(150vh, 78vw);
+height: auto;
+object-fit: cover;
+object-position: 85% center;
+filter: saturate(1.08) contrast(1.05) brightness(0.98) drop-shadow(0 0 60px rgba(255,255,255,0.28)) drop-shadow(0 0 130px rgba(160,200,255,0.18)) drop-shadow(0 0 220px rgba(120,170,255,0.12));
+}
+#experience-lines {      position: fixed;
+top: 0;
+right: 0;
+bottom: 0;
+width: 100vw;
+z-index: 18;
+opacity: 0;
+pointer-events: none;
+overflow: hidden;
+transition: opacity 0.6s ease;
+}
+#experience-lines.active { opacity: 1;
+}
+.experience-line {      position: absolute;
+top: 0;
+height: 100vh;
+background: rgba(220,245,255,0.12);
+box-shadow: 0 0 18px rgba(220,245,255,0.09);
+mix-blend-mode: screen;
+transform-origin: center;
+}
+#experience-timeline {      position: fixed;
+top: 50%;
+right: calc(7vw - 18px);
+width: min(560px, 46vw);
+z-index: 19;
+opacity: 0;
+pointer-events: none;
+transform: translateY(-50%) scale(0.96);
+transition: opacity 0.55s ease, transform 0.55s ease;
+color: rgba(235,245,255,0.92);
+}
+#experience-timeline.active {      opacity: 1;
+pointer-events: auto;
+transform: translateY(-50%) scale(1);
+}
+#experience-timeline {      display: flex;
+flex-direction: column;
+gap: 24px;
+}
+.timeline-item {      position: relative;
+display: grid;
+grid-template-columns: minmax(104px, 0.7fr) 108px minmax(260px, 1.35fr);
+align-items: center;
+gap: 18px;
+--timeline-line-x: calc((100% - 108px - 36px) * 0.7 / 2.05 + 18px + 54px);
+border-radius: 10px;
+transition: transform 0.38s cubic-bezier(0.16, 1, 0.3, 1), filter 0.38s ease;
+transform-origin: 52% 50%;
+cursor: pointer;
+}
+.timeline-item::before {      content: "";
+position: absolute;
+top: -80px;
+bottom: -80px;
+left: var(--timeline-line-x);
+width: 3px;
+background: linear-gradient(to bottom, rgba(190,220,255,0), rgba(190,220,255,0.42), rgba(190,220,255,0));
+}
+.timeline-time {      text-align: right;
+font-size: 12px;
+font-weight: 600;
+letter-spacing: 0.08em;
+line-height: 1.45;
+color: #fff;
+text-shadow: 0 0 3px rgba(255,255,255,0.62), 0 0 8px rgba(130,190,255,0.32);
+}
+.timeline-dot {      position: relative;
+z-index: 1;
+width: 108px;
+height: 30px;
+border-radius: 0;
+display: grid;
+place-items: center;
+background: transparent;
+border: 0;
+box-shadow: none;
+font-weight: 700;
+}
+.timeline-logo {
+display: block;
+width: 108px;
+height: 30px;
+object-fit: contain;
+border-radius: 0;
+filter: drop-shadow(0 0 8px rgba(255,255,255,0.22));
+}
+.timeline-company {      border: 0;
+background: transparent;
+color: #fff;
+text-align: left;
+font: inherit;
+font-size: 20px;
+font-weight: 700;
+line-height: 1.25;
+cursor: inherit;
+white-space: nowrap;
+text-shadow: 0 0 3px rgba(255,255,255,0.58), 0 0 9px rgba(130,190,255,0.32);
+}
+.company-by {      font-weight: 300;
+display: block;
+font-size: 0.72em;
+line-height: 1.25;
+margin-top: 2px;
+}
+.timeline-details {      grid-column: 3;
+max-height: 0;
+overflow: hidden;
+opacity: 0;
+margin-top: 0;
+font-size: 0.82rem;
+line-height: 1.55;
+color: rgba(225,238,255,0.78);
+transition: max-height 0.55s ease, opacity 0.55s ease, margin-top 0.55s ease;
+}
+.timeline-item.zoomed {      transform: scale(1.08);
+}
+.timeline-item:hover,
+.timeline-item:focus-within {      transform: translateZ(0) scale(1.055);
+filter: drop-shadow(0 0 16px rgba(215,238,255,0.5)) drop-shadow(0 0 30px rgba(110,185,255,0.28));
+animation: timeline-pop-glow 1.4s ease-in-out infinite alternate;
+}
+.timeline-item:hover .timeline-dot,
+.timeline-item:focus-within .timeline-dot {
+filter: drop-shadow(0 0 14px rgba(255,255,255,0.46)) drop-shadow(0 0 28px rgba(115,190,255,0.28));
+}
+.timeline-item:hover .timeline-time,
+.timeline-item:hover .timeline-company,
+.timeline-item:focus-within .timeline-time,
+.timeline-item:focus-within .timeline-company {
+text-shadow: 0 0 5px rgba(255,255,255,1), 0 0 18px rgba(160,215,255,0.92), 0 0 34px rgba(105,185,255,0.42);
+}
+@keyframes timeline-pop-glow {      from { filter: drop-shadow(0 0 12px rgba(215,238,255,0.35)) drop-shadow(0 0 24px rgba(110,185,255,0.2));
+}
+to { filter: drop-shadow(0 0 20px rgba(255,255,255,0.62)) drop-shadow(0 0 42px rgba(110,185,255,0.38));
+}
+}
+.timeline-item.zoomed .timeline-details {      max-height: 0;
+opacity: 0;
+margin-top: 0;
+}
+#experience-callout {      position: fixed;
+left: clamp(32px, 7vw, 96px);
+top: 50%;
+width: min(520px, 42vw);
+z-index: 24;
+opacity: 0;
+pointer-events: none;
+color: rgba(245,250,255,0.96);
+transform: translate3d(-22px, calc(-50% + 24px), 0) scale(0.96);
+filter: blur(14px);
+clip-path: inset(18% 0 18% 0);
+transition: opacity 0.42s ease, transform 0.58s cubic-bezier(0.16, 1, 0.3, 1), filter 0.48s ease, clip-path 0.58s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#experience-callout.active {      opacity: 1;
+pointer-events: auto;
+transform: translate3d(0, -50%, 0) scale(1);
+filter: blur(0);
+clip-path: inset(0 0 0 0);
+}
+#experience-callout.exiting {      opacity: 0;
+transform: translate3d(30px, calc(-50% - 18px), 0) scale(1.025);
+filter: blur(18px);
+clip-path: inset(0 18% 0 18%);
+transition-duration: 0.34s;
+}
+.callout-shell {      position: relative;
+padding: 24px 26px 26px;
+border-left: 1px solid rgba(255,255,255,0.5);
+border-radius: 12px;
+background: linear-gradient(112deg, rgba(5,8,15,0.82), rgba(22,32,48,0.58));
+box-shadow: 0 24px 90px rgba(0,0,0,0.38), 0 0 54px rgba(90,180,255,0.34), 0 0 110px rgba(255,255,255,0.14);
+backdrop-filter: blur(18px);
+font-weight: 500;
+isolation: isolate;
+overflow: visible;
+}
+.callout-shell > * {
+position: relative;
+z-index: 1;
+}
+.callout-shell::before,
+.callout-shell::after {      content: "";
+position: absolute;
+pointer-events: none;
+}
+.callout-shell::before {
+inset: 0;
+border-radius: inherit;
+border: 1px solid rgba(220,240,255,0.48);
+box-shadow: inset 0 0 24px rgba(150,205,255,0.16), 0 0 20px rgba(95,175,255,0.22);
+}
+.callout-shell::after {
+inset: -2px;
+border-radius: inherit;
+padding: 2px;
+background: linear-gradient(115deg, transparent 0%, transparent 24%, rgba(110,205,255,0.15) 38%, rgba(255,255,255,1) 48%, rgba(95,190,255,0.95) 56%, rgba(255,255,255,0.34) 64%, transparent 78%, transparent 100%);
+background-size: 280% 280%;
+-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+opacity: 1;
+filter: drop-shadow(0 0 12px rgba(120,205,255,0.75));
+animation: callout-light-trace 1.7s ease-in-out infinite;
+}
+@keyframes callout-light-trace {
+0% { background-position: 145% 0%;
+opacity: 0.36;
+}
+34%, 68% { opacity: 1;
+}
+100% { background-position: -95% 100%;
+opacity: 0.42;
+}
+}
+#callout-period {      font-size: 12px;
+font-weight: 700;
+letter-spacing: 0.14em;
+text-transform: uppercase;
+color: #fff;
+margin-bottom: 12px;
+}
+#callout-company {      font-size: clamp(24px, 2.3vw, 29px);
+line-height: 1.02;
+font-weight: 760;
+letter-spacing: 0;
+text-shadow: 0 0 18px rgba(175,215,255,0.34);
+}
+.callout-by {      display: block;
+margin-top: 3px;
+font-size: 18px;
+line-height: 1.16;
+font-weight: 650;
+color: rgba(228,240,255,0.9);
+}
+#callout-role {      margin-top: 12px;
+font-size: 15px;
+line-height: 1.45;
+font-weight: 650;
+color: rgba(245,250,255,0.88);
+}
+#callout-body {      margin-top: 14px;
+font-size: 14px;
+line-height: 1.62;
+color: #fff;
+opacity: 0;
+transform: translateY(7px);
+filter: blur(8px);
+transition: opacity 1.7s ease, transform 1.7s ease, filter 1.7s ease;
+text-shadow: 0 0 12px rgba(160,215,255,0.18);
+}
+#experience-callout.active #callout-body {
+opacity: 1;
+transform: translateY(0);
+filter: blur(0);
+}
+@media (max-width: 900px) {
+  #experience-callout {      left: 20px;
+right: 20px;
+top: auto;
+bottom: 24px;
+width: auto;
+}
+}
+#sg-map {      position: fixed;
+left: 9vw;
+top: 52%;
+width: min(520px, 42vw);
+aspect-ratio: 1.45;
+z-index: 21;
+opacity: 0;
+pointer-events: none;
+perspective: 900px;
+transform: translateY(-50%);
+transition: opacity 0.55s ease;
+}
+#sg-map.active {      opacity: 0.94;
+}
+#sg-map.active.focused {
+opacity: 0.3;
+}
+#sg-map-inner {      position: absolute;
+inset: 0;
+transform-style: preserve-3d;
+transition: transform 0.85s cubic-bezier(0.16, 1, 0.3, 1);
+background: radial-gradient(circle at 50% 50%, rgba(255,255,255,0.06), rgba(255,255,255,0) 66%);
+}
+#sg-map.focused #sg-map-inner {      transform: var(--map-transform);
+}
+.sg-shape {      position: absolute;
+inset: 4% 0;
+filter: grayscale(1) brightness(2.9) contrast(1.55) drop-shadow(0 0 10px rgba(255,255,255,0.5)) drop-shadow(0 0 24px rgba(255,255,255,0.22));
+background-image: url('sg_map.png');
+background-size: contain;
+background-position: center;
+background-repeat: no-repeat;
+mix-blend-mode: normal;
+}
+.sg-shape * { opacity: 0;
+}
+.sg-pin {      position: absolute;
+left: var(--x);
+top: var(--y);
+z-index: 2;
+width: 15px;
+height: 15px;
+border-radius: 50% 50% 50% 0;
+background: #e9336d;
+border: 1px solid rgba(255,255,255,0.9);
+box-shadow: 0 3px 12px rgba(233,51,109,0.45);
+transform: translate(-50%, -100%) rotate(-45deg);
+transition: opacity 0.35s ease, transform 0.65s ease;
+}
+.sg-pin::after {      content: "";
+position: absolute;
+left: 50%;
+top: 50%;
+width: 5px;
+height: 5px;
+border-radius: 50%;
+background: #fff;
+transform: translate(-50%, -50%);
+}
+#sg-map.focused .sg-pin {      opacity: 0;
+}
+#sg-map.focused .sg-pin.active {      opacity: 1;
+transform: translate(-50%, -100%) rotate(-45deg) scale(1.45);
+}
+
+
+/* ---- Xray Film & About Text ---- */
+#xray-film-container {      position: fixed;
+top: 50%;
+left: 50%;
+transform: none;
+translate: 70vw -80%;
+rotate: 10deg;
+scale: 0.65;
+z-index: 17;
+opacity: 0;
+pointer-events: none;
+transition: opacity 0.8s ease, translate 1.1s cubic-bezier(0.16, 1, 0.3, 1), rotate 1.1s cubic-bezier(0.16, 1, 0.3, 1), scale 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+--xray-size: 1;
+--xray-shift: 0%;
+--xray-final-x: 19vw;
+width: clamp(370px, 39vw, 760px);
+max-height: 96vh;
+isolation: isolate;
+}
+#about-sam-portrait {      position: fixed;
+left: 25.2vw;
+bottom: -2.5vh;
+z-index: 18;
+height: clamp(370px, 62vh, 620px);
+width: auto;
+opacity: 0;
+pointer-events: none;
+transform: translateX(-20%) translateY(34px) scale(0.96);
+filter: drop-shadow(0 24px 42px rgba(0,0,0,0.46)) drop-shadow(0 0 28px rgba(255,255,255,0.16));
+transition: opacity 1s ease, transform 1.15s cubic-bezier(0.16, 1, 0.3, 1), filter 1.15s ease;
+}
+#about-close-zone {
+position: fixed;
+inset: 0;
+z-index: 16;
+opacity: 0;
+pointer-events: none;
+background: transparent;
+border: 0;
+padding: 0;
+cursor: pointer;
+}
+#about-close-zone.visible {
+pointer-events: auto;
+}
+#about-sam-portrait.visible {      opacity: 1;
+transform: translateX(-20%) translateY(0) scale(1);
+filter: drop-shadow(0 28px 50px rgba(0,0,0,0.5)) drop-shadow(0 0 34px rgba(255,255,255,0.24));
+}
+#about-pixel-blast {
+position: fixed;
+left: calc(clamp(0px, 2.5vw, 42px) - 80px);
+bottom: clamp(0px, 3vh, 36px);
+width: clamp(480px, 52vw, 880px);
+height: clamp(330px, 46vh, 640px);
+z-index: 15;
+pointer-events: none;
+opacity: 0;
+transform: translate3d(-14px, 18px, 0) scale(0.98);
+transition: opacity 0.8s ease, transform 1s cubic-bezier(0.16, 1, 0.3, 1);
+mix-blend-mode: screen;
+overflow: hidden;
+border-radius: 50%;
+mask-image: radial-gradient(circle, black 0 62%, rgba(0,0,0,0.72) 76%, transparent 100%);
+}
+#about-pixel-blast::after {
+content: "";
+position: absolute;
+inset: 0;
+z-index: 2;
+pointer-events: none;
+border-radius: 50%;
+box-shadow: inset 0 0 42px rgba(0,0,0,0.42);
+}
+#about-pixel-blast.visible {
+opacity: 0.72;
+transform: translate3d(0, 0, 0) scale(1);
+pointer-events: auto;
+cursor: pointer;
+}
+.pixel-blast-container {
+width: 100%;
+height: 100%;
+}
+#about-pixel-blast canvas {
+display: block;
+width: 100%;
+height: 100%;
+position: relative;
+z-index: 1;
+opacity: 0.96;
+}
+#xray-film-container.visible { opacity: 0.7;
+translate: calc(-50% + var(--xray-final-x) + var(--xray-shift)) -50%;
+rotate: 0deg;
+scale: var(--xray-size);
+}
+#xray-film-container::before,
+#xray-film-container::after {      content: "";
+position: absolute;
+inset: 7% 6%;
+border: 1px solid rgba(184,218,255,0.18);
+background: rgba(120,170,220,0.045);
+filter: blur(0.4px);
+z-index: -1;
+}
+#xray-film-container::before { transform: translate(-24px, 20px) rotate(-4deg);
+}
+#xray-film-container::after { transform: translate(-46px, 38px) rotate(-7deg);
+opacity: 0.62;
+}
+#xray-film-container.settling {      animation: film-swing 0.8s ease-out both;
+}
+@keyframes film-swing {      0% { rotate: 0deg;
+}
+28% { rotate: -3.5deg;
+}
+55% { rotate: 2deg;
+}
+78% { rotate: -0.8deg;
+}
+100% { rotate: 0deg;
+}
+}
+#xray-film-container img {      display: block;
+width: 100%;
+height: auto;
+max-height: 96vh;
+object-fit: contain;
+filter: drop-shadow(0 0 40px rgba(255,255,255,0.2));
+}
+.xray-film-layer {
+position: relative;
+z-index: 2;
+}
+.xray-film-echo {
+position: absolute;
+inset: 0;
+z-index: 0;
+opacity: 0;
+transform: translateY(34px) rotate(-5deg) scale(0.98);
+transition: opacity 0.9s ease, transform 1.1s cubic-bezier(0.16, 1, 0.3, 1);
+filter: drop-shadow(0 0 34px rgba(255,255,255,0.16));
+}
+.xray-film-echo.echo-a {
+transform: translate(-34px, 46px) rotate(-5deg) scale(0.98);
+}
+.xray-film-echo.echo-b {
+transform: translate(38px, 86px) rotate(4deg) scale(0.96);
+}
+#xray-film-container.step-two .xray-film-echo {
+opacity: 0.58;
+}
+#xray-film-container.step-two .xray-film-echo.echo-a {
+transform: translate(-112px, 65px) rotate(2deg) scale(0.96);
+}
+#xray-film-container.step-two .xray-film-echo.echo-b {
+opacity: 0.5;
+transform: translate(210px, 175px) rotate(-18deg) scale(0.96);
+transition-delay: 0.3s;
+}
+#about-bling-field {
+position: fixed;
+inset: 0;
+z-index: 6;
+pointer-events: none;
+opacity: 0;
+transition: opacity 0.8s ease;
+}
+#about-bling-field.visible {
+opacity: 1;
+}
+@media (max-width: 900px) {
+#about-close-zone {
+inset: 0;
+}
+}
+.about-bling {
+position: absolute;
+width: var(--bling-size, 34px);
+height: var(--bling-size, 34px);
+left: var(--bling-x);
+top: var(--bling-y);
+opacity: 0;
+object-fit: contain;
+filter: drop-shadow(0 0 12px rgba(255,255,255,0.72)) drop-shadow(0 0 24px rgba(145,205,255,0.34));
+animation: about-bling-blink var(--bling-speed, 3s) ease-in-out infinite;
+animation-delay: var(--bling-delay, 0s);
+}
+@keyframes about-bling-blink {
+0%, 68%, 100% { opacity: 0;
+transform: scale(0.55) rotate(-8deg);
+filter: drop-shadow(0 0 4px rgba(255,255,255,0.15));
+}
+72% { opacity: 0.85;
+transform: scale(1.06) rotate(4deg);
+filter: drop-shadow(0 0 14px rgba(255,255,255,0.82)) drop-shadow(0 0 30px rgba(145,205,255,0.42));
+}
+78% { opacity: 0.18;
+transform: scale(0.82) rotate(-2deg);
+}
+84% { opacity: 1;
+transform: scale(1.18) rotate(7deg);
+}
+}
+#about-speaker {      position: absolute;
+left: 11%;
+top: 12%;
+z-index: 2;
+width: 46px;
+height: 46px;
+border-radius: 50%;
+border: 1px solid rgba(216,235,253,0.55);
+background: rgba(24,34,46,0.82);
+box-shadow: 0 0 20px rgba(130,190,255,0.28);
+opacity: 0;
+transition: opacity 1.1s ease 0.35s, transform 1.1s ease 0.35s;
+transform: translateY(8px);
+}
+#about-speaker::before {      content: "";
+position: absolute;
+left: 13px;
+top: 15px;
+border-style: solid;
+border-width: 8px 12px 8px 0;
+border-color: transparent #d8ebfd transparent transparent;
+}
+#about-speaker::after {      content: "";
+position: absolute;
+right: 10px;
+top: 12px;
+width: 12px;
+height: 18px;
+border-right: 2px solid rgba(216,235,253,0.8);
+border-radius: 50%;
+}
+#about-text {      position: absolute;
+display: block;
+top: calc(9% + 25px);
+left: 50%;
+transform: translateX(-50%);
+z-index: 4;
+--about-frame-width: 82%;
+--about-font-size: 0.875rem;
+--about-glow-a: rgba(143,199,255,0.62);
+--about-glow-b: rgba(255,170,96,0.32);
+width: var(--about-frame-width);
+height: 74%;
+max-height: 74%;
+overflow-y: auto;
+opacity: 0;
+pointer-events: none;
+filter: blur(12px) contrast(0.15) brightness(1.8);
+transition: opacity 2s ease, filter 2.2s ease;
+text-align: justify;
+color: rgba(226,238,248,0.9);
+background:
+linear-gradient(112deg, rgba(5,8,15,0.82), rgba(22,32,48,0.58));
+font-size: var(--about-font-size);
+line-height: 1.42;
+font-weight: 200;
+letter-spacing: 0.01em;
+text-shadow: none;
+-webkit-text-stroke: 0;
+mix-blend-mode: normal;
+border-radius: 12px;
+padding: 8px 22px;
+margin: 0;
+border: 0;
+box-shadow:
+0 24px 90px rgba(0,0,0,0.38),
+0 0 54px rgba(90,180,255,0.34),
+0 0 110px rgba(255,255,255,0.14);
+backdrop-filter: blur(18px);
+isolation: isolate;
+}
+#about-text::before,
+#about-text::after {      content: "";
+position: absolute;
+border-radius: inherit;
+pointer-events: none;
+}
+#about-text::before {
+inset: 0;
+z-index: 0;
+border: 1px solid rgba(220,240,255,0.48);
+box-shadow: inset 0 0 24px rgba(150,205,255,0.16), 0 0 20px rgba(95,175,255,0.22);
+opacity: 0;
+transition: opacity 1.6s ease;
+}
+#about-text::after {
+z-index: 0;
+inset: 0;
+padding: 2px;
+background: linear-gradient(115deg, transparent 0%, transparent 24%, rgba(110,205,255,0.15) 38%, rgba(255,255,255,1) 48%, rgba(95,190,255,0.95) 56%, rgba(255,255,255,0.34) 64%, transparent 78%, transparent 100%);
+background-size: 280% 280%;
+-webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+-webkit-mask-composite: xor;
+mask-composite: exclude;
+opacity: 0;
+filter: drop-shadow(0 0 12px rgba(120,205,255,0.75));
+transition: opacity 1.6s ease;
+}
+#about-text.visible { opacity: 1;
+pointer-events: auto;
+filter: blur(0) contrast(1.05) brightness(1);
+}
+#about-text.visible::before { opacity: 1;
+}
+#about-text.visible::after { opacity: 1;
+animation: callout-light-trace 3.4s ease-in-out infinite;
+}
+@keyframes about-edge-sweep {      0% { filter: hue-rotate(-8deg) brightness(0.75);
+opacity: 0.18;
+}
+35% { filter: hue-rotate(0deg) brightness(1.25);
+opacity: 0.9;
+}
+100% { filter: hue-rotate(8deg) brightness(0.9);
+opacity: 0.58;
+}
+}
+#about-text p { margin: 2px 0 0;
+position: relative;
+z-index: 2;
+padding-left: 0;
+height: auto;
+overflow: visible;
+opacity: 0;
+transform: translateY(7px);
+transition: opacity 1.7s ease, transform 1.7s ease, filter 1.7s ease;
+filter: blur(6px);
+}
+#about-text.visible p { opacity: 1;
+transform: translateY(0);
+filter: blur(0);
+}
+#about-title {      display: inline-block;
+font-size: 20px;
+font-weight: 500;
+color: rgba(241,248,255,0.96);
+letter-spacing: 0;
+}
+#about-text::-webkit-scrollbar { width: 4px;
+}
+#about-text::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2);
+border-radius: 2px;
+}
+
+
+.contact-card-effect {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+border: 0;
+background: transparent;
+}
+.contact-card-effect {
+z-index: 2;
+}
+#contact-stage {
+position: fixed;
+inset: 0;
+z-index: 22;
+display: grid;
+align-items: center;
+justify-items: end;
+opacity: 0;
+pointer-events: none;
+overflow: hidden;
+padding: 24px;
+transition: opacity 0.8s ease;
+}
+#contact-stage.active {
+opacity: 1;
+pointer-events: auto;
+}
+.strands-container {
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+background: transparent;
+z-index: 1;
+pointer-events: none;
+}
+.strands-container canvas {
+display: block;
+width: 100%;
+height: 100%;
+}
+#contact-strands-panel {
+position: absolute;
+right: 18px;
+bottom: 18px;
+z-index: 3;
+width: 214px;
+padding: 12px;
+border: 1px solid rgba(255,255,255,0.14);
+border-radius: 8px;
+background: rgba(7,10,16,0.68);
+backdrop-filter: blur(10px);
+box-shadow: 0 18px 40px rgba(0,0,0,0.28);
+pointer-events: auto;
+}
+#contact-strands-panel h3 {
+margin: 0 0 10px;
+font-size: 0.72rem;
+font-weight: 700;
+letter-spacing: 0.08em;
+text-transform: uppercase;
+color: rgba(255,255,255,0.82);
+}
+.contact-strand-row {
+display: grid;
+grid-template-columns: 72px 1fr 34px;
+gap: 8px;
+align-items: center;
+margin-top: 8px;
+font-size: 0.68rem;
+color: rgba(220,230,255,0.72);
+}
+.contact-strand-row input {
+width: 100%;
+accent-color: #b9e6ff;
+}
+.contact-strand-row .val {
+text-align: right;
+font-variant-numeric: tabular-nums;
+color: rgba(255,255,255,0.72);
+}
+.project-asset {
+position: absolute;
+display: block;
+height: auto;
+object-fit: contain;
+user-select: none;
+mix-blend-mode: screen;
+filter: saturate(1.15) contrast(1.08) drop-shadow(0 0 22px rgba(120,215,255,0.36)) drop-shadow(0 28px 44px rgba(0,0,0,0.5));
+}
+
+/* __SKILL_CSS__ */
+#skill-session {
+  position: fixed;
+  left: 75vw;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform: translate(calc(-50% - (var(--skill-view-size) * 0.15)), -50%);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 18;
+  transition: opacity 0.7s ease;
+  --skill-radius: 482px;
+  --skill-capsule-height: 35px;
+  --skill-capsule-pad-x: 18px;
+  --skill-font-size: 14px;
+  --skill-view-size: 129vmin;
+  --skill-edge-fade-size: 175px;
+  --skill-overlay-inner: 80%;
+  --skill-overlay-mid: 95%;
+  --skill-overlay-blur-start: 53%;
+  --skill-overlay-blur-end: 88%;
+  --skill-blur-strength: 2.5px;
+  --skill-overlay-color: #050505;
+  --skill-hint-left: calc(var(--skill-view-size) * -0.5);
+  --skill-hint-top: calc(var(--skill-view-size) * -0.28);
+  --skill-hint-shift-x: 8px;
+  --skill-hint-shift-y: -15px;
+  --skill-copy-left: calc(var(--skill-view-size) * -0.92 - 22px);
+  --skill-copy-top: calc(var(--skill-view-size) * 0.14);
+  --skill-copy-shift-y: calc(-100% + 119px);
+  --skill-copy-width: clamp(340px, 28.8vw, 369px);
+  --skill-stage-shift-x: 32px;
+}
+#skill-session.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+#skill-drag-hint,
+#skill-copy {
+  position: absolute;
+  color: rgba(232, 240, 248, 0.92);
+}
+#skill-drag-hint {
+  pointer-events: none;
+}
+#skill-drag-hint {
+  left: var(--skill-hint-left);
+  top: var(--skill-hint-top);
+  transform: translate(var(--skill-hint-shift-x), var(--skill-hint-shift-y));
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  opacity: 0;
+  text-shadow: 0 0 18px rgba(255, 255, 255, 0.14);
+  transition: opacity 0.7s ease;
+  white-space: nowrap;
+  z-index: 2;
+}
+#skill-session.active #skill-drag-hint {
+  opacity: 0.68;
+}
+#skill-copy {
+  pointer-events: auto;
+  left: var(--skill-copy-left);
+  top: var(--skill-copy-top);
+  transform: translateY(var(--skill-copy-shift-y));
+  width: var(--skill-copy-width);
+  min-height: clamp(320px, 39vh, 474px);
+  padding: 20px;
+  overflow: hidden;
+  opacity: 0;
+  background: linear-gradient(112deg, rgba(5,8,15,0.82), rgba(22,32,48,0.58));
+  border-radius: 12px;
+  box-shadow: 0 24px 90px rgba(0,0,0,0.38), 0 0 54px rgba(90,180,255,0.34), 0 0 110px rgba(255,255,255,0.14);
+  backdrop-filter: blur(18px);
+  filter: blur(12px) contrast(0.15) brightness(1.8);
+  transition: opacity 2s ease, filter 2.2s ease;
+  isolation: isolate;
+}
+#skill-copy::before,
+#skill-copy::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+#skill-copy::before {
+  border: 1px solid rgba(220,240,255,0.48);
+  box-shadow: inset 0 0 24px rgba(150,205,255,0.16), 0 0 20px rgba(95,175,255,0.22);
+  opacity: 0;
+  transition: opacity 1.6s ease;
+}
+#skill-copy::after {
+  inset: 0;
+  padding: 2px;
+  background: linear-gradient(115deg, transparent 0%, transparent 24%, rgba(110,205,255,0.15) 38%, rgba(255,255,255,1) 48%, rgba(95,190,255,0.95) 56%, rgba(255,255,255,0.34) 64%, transparent 78%, transparent 100%);
+  background-size: 280% 280%;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  filter: drop-shadow(0 0 12px rgba(120,205,255,0.75));
+  transition: opacity 1.6s ease;
+}
+#skill-session.active #skill-copy {
+  opacity: 1;
+  filter: blur(0) contrast(1.05) brightness(1);
+}
+#skill-session.active #skill-copy::before,
+#skill-session.active #skill-copy::after {
+  opacity: 1;
+}
+#skill-session.active #skill-copy::after {
+  animation: callout-light-trace 3.4s ease-in-out infinite;
+}
+.skill-copy-section {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 338px;
+  margin: 0 0 22px;
+  opacity: 0;
+  transform: translateY(7px);
+  filter: blur(6px);
+  transition: opacity 0.93s ease, transform 0.93s ease, filter 0.93s ease;
+}
+.skill-copy-section:last-child {
+  margin-bottom: 0;
+}
+#skill-copy p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.48;
+  font-weight: 300;
+}
+#skill-session.active .skill-copy-section {
+  opacity: 1;
+  transform: translateY(0);
+  filter: blur(0);
+}
+.skill-copy-title {
+  display: inline-block;
+  margin: 0 0 10px;
+  font-size: 18px;
+  font-weight: 800;
+  color: rgba(241, 248, 255, 0.96);
+  letter-spacing: 0;
+}
+.skill-edu-school-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 10px;
+  margin: 0 0 4px;
+}
+.skill-edu-school-row p {
+  min-width: 0;
+}
+.skill-edu-degree {
+  display: grid;
+  margin: 0 0 4px;
+}
+.skill-edu-degree span,
+.skill-edu-year {
+  font-size: 13px;
+  line-height: 1.48;
+  font-weight: 300;
+}
+.skill-edu-year {
+  white-space: nowrap;
+}
+.skill-stage,
+.skill-overlay,
+.skill-overlay-blur {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: var(--skill-view-size);
+  height: var(--skill-view-size);
+  transform: translate(calc(-50% + var(--skill-stage-shift-x)), -50%);
+  border-radius: 50%;
+}
+.skill-stage {
+  perspective: 1250px;
+  perspective-origin: 50% 50%;
+  overflow: hidden;
+  background: transparent;
+  cursor: grab;
+  -webkit-mask-image: radial-gradient(circle, rgba(0,0,0,1) 0 72%, rgba(0,0,0,0.72) 82%, rgba(0,0,0,0) 92%);
+  mask-image: radial-gradient(circle, rgba(0,0,0,1) 0 72%, rgba(0,0,0,0.72) 82%, rgba(0,0,0,0) 92%);
+}
+.skill-stage.is-dragging {
+  cursor: grabbing;
+}
+.skill-sphere,
+.skill-item,
+.skill-item-inner {
+  transform-style: preserve-3d;
+}
+.skill-sphere {
+  position: absolute;
+  inset: 0;
+  transform: translateZ(calc(var(--skill-radius) * -1)) rotateZ(var(--skill-sphere-z, -30deg)) rotateX(var(--skill-sphere-x, -1deg)) rotateY(var(--skill-sphere-y, -2deg));
+  will-change: transform;
+}
+.skill-overlay,
+.skill-overlay-blur,
+.skill-edge-fade {
+  pointer-events: none;
+  display: none;
+}
+.skill-item {
+  width: max-content;
+  height: var(--skill-capsule-height);
+  position: absolute;
+  top: -999px;
+  bottom: -999px;
+  left: -999px;
+  right: -999px;
+  margin: auto;
+  transform-origin: 50% 50%;
+  backface-visibility: hidden;
+}
+.skill-item-inner {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: max-content;
+  height: 100%;
+  min-width: 0;
+  padding: 0 var(--skill-capsule-pad-x);
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, var(--skill-blink, 0.75));
+  color: #050505;
+  overflow: hidden;
+  backface-visibility: hidden;
+  box-shadow: 0 0 24px rgba(255, 255, 255, calc(var(--skill-blink, 0.75) * 0.14));
+}
+.skill-item-inner span {
+  white-space: nowrap;
+  font-size: var(--skill-font-size);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: var(--skill-text-blink, 1);
+  transition: opacity 180ms linear;
+}
+@media (max-width: 900px) {
+  #skill-session {
+    left: 70vw;
+  }
+  #skill-drag-hint {
+    --skill-hint-left: calc(var(--skill-view-size) * -0.36);
+    --skill-hint-top: calc(var(--skill-view-size) * -0.28);
+  }
+  #skill-copy {
+    --skill-copy-left: calc(var(--skill-view-size) * -0.55);
+    --skill-copy-top: calc(var(--skill-view-size) * 0.17);
+    --skill-copy-shift-y: calc(-100% + 88px);
+    --skill-copy-width: min(52vw, 360px);
+  }
+}
+
+/* ---- Atom shifted to corner ---- */    #atom-svg {      position: fixed;
+top: 50%;
+left: 50%;
+transform: translate(-50%, -50%) scale(1);
+transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+z-index: 5;
+width: min(600px, 85vmin);
+height: min(600px, 85vmin);
+}
+#atom-svg.shifted {      transform: translate(-135%, -88%) scale(0.8);
+}
+#atom-svg.shifted-opt2 {      transform: translate(-128%, -82%) scale(0.75);
+}
+#atom-svg.shifted-opt3 {      transform: translate(-120%, -76%) scale(0.72);
+}
+#atom-svg.shifted-opt4 {      transform: translate(-112%, -70%) scale(0.68);
+}
+#atom-svg.shifted-opt5 {      transform: translate(-104%, -64%) scale(0.66);
+}
+</style>
+</head>
+<body>
+<div id="_err" style="position:fixed;
+bottom:4px;
+left:4px;
+z-index:99;
+color:red;
+font:10px monospace;
+pointer-events:none;
+max-width:90vw;
+word-break:break-all">
+</div>
+<audio id="bg-music" src="bg_music.mp3" autoplay loop style="display:none">
+</audio>
+<div id="letterbox-top" class="letterbox top">
+</div>
+<div id="letterbox-bottom" class="letterbox bottom">
+</div>
+<canvas id="bg-canvas">
+</canvas>
+<svg id="atom-svg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="premiumBloom" x="-50%" y="-50%" width="200%" height="200%">
+<feGaussianBlur stdDeviation="6" result="blur1" />
+<feGaussianBlur stdDeviation="2" result="blur2" />
+<feMerge>
+<feMergeNode in="blur1" />
+<feMergeNode in="blur2" />
+<feMergeNode in="SourceGraphic" />
+</feMerge>
+</filter>
+<radialGradient id="vignette" cx="50%" cy="50%" r="70%">
+<stop offset="0%" stop-color="#11131c" stop-opacity="0.3" />
+<stop offset="100%" stop-color="#07080b" stop-opacity="0" />
+</radialGradient>
+<path id="text-ring-path" d="M 300,205 A 95,95 0 1,1 299.9,205" fill="none" />
+</defs>
+<circle cx="300" cy="300" r="280" fill="url(#vignette)" />
+<!-- Name ring -->
+<text id="name-ring" font-family="Inter, Segoe UI, sans-serif" font-size="20" font-weight="600" fill="rgba(255,255,255,0.9)" letter-spacing="12" text-anchor="middle">
+<textPath href="#text-ring-path" startOffset="50%">SAM CHU</textPath>
+</text>
+<!-- Orbits (3 tracks) -->
+<g id="orbits-group" stroke="#ffffff" fill="none" opacity="0.35">
+<ellipse cx="300" cy="300" rx="180" ry="50" stroke-width="1.3" stroke-dasharray="6 24 4 8" />
+<ellipse cx="300" cy="300" rx="180" ry="50" stroke-width="1.3" stroke-dasharray="8 18 2 6" />
+<ellipse cx="300" cy="300" rx="180" ry="50" stroke-width="1.3" stroke-dasharray="4 28 10 14" />
+<ellipse cx="300" cy="300" rx="180" ry="50" stroke-width="1.3" stroke-dasharray="2 30 12 16" />
+<ellipse cx="300" cy="300" rx="180" ry="50" stroke-width="1.3" stroke-dasharray="10 20 3 9" />
+</g>
+<!-- Particles -->
+<g id="particles-group">
+<g>
+<circle r="24" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<circle r="8" fill="#fff" opacity="0.25" filter="url(#premiumBloom)" />
+<circle r="1.75" fill="#fff" opacity="1" />
+</g>
+<g>
+<circle r="24" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<circle r="8" fill="#fff" opacity="0.25" filter="url(#premiumBloom)" />
+<circle r="1.75" fill="#fff" opacity="1" />
+</g>
+<g>
+<circle r="24" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<circle r="8" fill="#fff" opacity="0.25" filter="url(#premiumBloom)" />
+<circle r="1.75" fill="#fff" opacity="1" />
+</g>
+<g>
+<circle r="24" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<circle r="8" fill="#fff" opacity="0.25" filter="url(#premiumBloom)" />
+<circle r="1.75" fill="#fff" opacity="1" />
+</g>
+<g>
+<circle r="24" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<circle r="8" fill="#fff" opacity="0.25" filter="url(#premiumBloom)" />
+<circle r="1.75" fill="#fff" opacity="1" />
+</g>
+</g>
+<!-- Nucleus -->
+<circle id="nucleus-haze2" cx="300" cy="300" r="110" fill="#fff" opacity="0.004" filter="url(#premiumBloom)" />
+<circle id="nucleus-haze" cx="300" cy="300" r="75" fill="#fff" opacity="0.012" filter="url(#premiumBloom)" />
+<circle id="nucleus-glow1" cx="300" cy="300" r="50" fill="#fff" opacity="0.025" filter="url(#premiumBloom)" />
+<circle id="nucleus-glow2" cx="300" cy="300" r="28" fill="#fff" opacity="0.06" filter="url(#premiumBloom)" />
+<image id="nucleus-img" href="center.png" x="260" y="260" width="80" height="80" opacity="0.85" />
+<!-- Cosmic dust -->
+<g id="dust-group" fill="#fff">
+<circle id="dust-0" cx="320" cy="280" r="0.5" opacity="0.3" />
+<circle id="dust-1" cx="275" cy="320" r="0.4" opacity="0.25" />
+<circle id="dust-2" cx="330" cy="310" r="0.35" opacity="0.2" />
+<circle id="dust-3" cx="280" cy="270" r="0.45" opacity="0.28" />
+<circle id="dust-4" cx="310" cy="330" r="0.3" opacity="0.22" />
+<circle id="dust-5" cx="260" cy="300" r="0.5" opacity="0.25" />
+<circle id="dust-6" cx="340" cy="295" r="0.35" opacity="0.2" />
+<circle id="dust-7" cx="290" cy="260" r="0.4" opacity="0.3" />
+</g>
+</svg>
+<div id="el-label-0" class="electron-label" data-short="A" data-full="About">A</div>
+<div id="el-label-1" class="electron-label" data-short="E" data-full="Experiences">E</div>
+<div id="el-label-2" class="electron-label" data-short="S" data-full="Skill">S</div>
+<div id="el-label-3" class="electron-label" data-short="P" data-full="Projects">P</div>
+<div id="el-label-4" class="electron-label" data-short="C" data-full="Contact">C</div>
+<div id="planet-backdrop">
+</div>
+<div id="planet-overlay">
+<img id="planet-img" src="" alt="" />
+</div>
+<div id="experience-lines">
+</div>
+<div id="sg-map">
+<div id="sg-map-inner">
+<svg class="sg-shape" viewBox="0 0 520 340" aria-hidden="true">
+<defs>
+<pattern id="sg-dot-pattern" width="4.8" height="4.8" patternUnits="userSpaceOnUse">
+<circle cx="1.7" cy="1.7" r="0.92" fill="rgba(255,255,255,0.96)" />
+</pattern>
+</defs>
+<path d="M18 205 L30 170 L46 156 L52 126 L65 113 L89 104 L109 78 L142 55 L166 50 L198 49 L214 58 L226 84 L222 101 L232 114 L218 132 L222 150 L245 150 L260 132 L287 118 L309 96 L340 72 L369 54 L401 45 L438 49 L454 42 L462 53 L483 64 L502 79 L510 97 L500 111 L478 111 L462 125 L444 153 L424 166 L404 174 L388 190 L365 191 L347 183 L328 190 L308 184 L292 198 L265 203 L236 202 L211 210 L186 206 L164 215 L135 209 L114 220 L87 214 L66 223 L43 218 L18 205 Z" fill="url(#sg-dot-pattern)" stroke="rgba(241,244,248,0.5)" stroke-width="1.1" />
+<path d="M207 131 L219 120 L232 126 L238 140 L225 150 Z M337 132 L352 123 L370 131 L383 145 L371 157 L350 151 Z M392 111 L408 103 L426 111 L437 126 L421 138 L402 132 Z M85 241 L127 225 L158 234 L146 261 L111 266 Z M179 238 L208 229 L239 241 L224 264 L191 259 Z M265 237 L295 230 L323 244 L309 269 L276 262 Z M337 231 L368 224 L397 236 L386 259 L353 255 Z M203 288 L226 278 L246 287 L239 303 L213 306 Z M255 299 L276 292 L298 301 L289 318 L263 318 Z M329 282 L350 275 L372 285 L364 301 L339 301 Z" fill="url(#sg-dot-pattern)" stroke="rgba(241,244,248,0.28)" stroke-width="0.75" />
+</svg>
+<span class="sg-pin" data-map-index="0" style="--x:52.2%;--y:61.5%"></span>
+<span class="sg-pin" data-map-index="1" style="--x:41.5%;--y:58.2%"></span>
+<span class="sg-pin" data-map-index="2" style="--x:56.5%;--y:53.2%"></span>
+<span class="sg-pin" data-map-index="3" style="--x:42.5%;--y:56.8%"></span>
+<span class="sg-pin" data-map-index="4" style="--x:58.2%;--y:51.8%"></span>
+<span class="sg-pin" data-map-index="5" style="--x:60.5%;--y:56.2%"></span>
+</div>
+</div>
+<div id="experience-timeline">
+<div class="timeline-item">
+<div class="timeline-time">April 2013<br>May 2015</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_sgh.png" alt="Singapore General Hospital logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="0">Singapore General Hospital <span class="company-by">Public Hospital</span></button>
+<div class="timeline-details">Radiographer<br>Provided General Radiography imaging services across in-patient, out-patient, and emergency departments.<br>Led Quality improvement project to reduce incorrect potable requests.</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">July 2015<br>Oct 2017</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_nuh.png" alt="National University Hospital logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="1">National University Hospital <span class="company-by">Public Hospital</span></button>
+<div class="timeline-details">Radiographer<br>Provided General Radiography imaging services across in-patient, out-patient, and emergency departments.<br>Led Quality improvement project to reduce radiation dose for NICU patients with DR system.</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">Jan 2018<br>Mar 2022</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_meh.png" alt="Mount Elizabeth Hospital logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="2">Mount Elizabeth Hospital Orchard <span class="company-by">by IHH Healthcare</span></button>
+<div class="timeline-details">Radiographer<br>Provided General Radiography / CT imaging services across in-patient, out-patient, and emergency departments.<br>Imaging guided procedures. ( CT / Fluoroscopy )</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">April 2022<br>Feb 2023</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_early.png" alt="Early Medical Centre logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="3">Early Medical Centre <span class="company-by">by MiRXES</span></button>
+<div class="timeline-details">Senior Radiographer / MOH CT section leader X-ray section leader (Founding Team)<br>Independently set up imaging services for a health screening start-up, overseeing planning, radiological licensing, QA manuals, hardware/software setup, workflow design, to full operation.<br>Section leaders and daily operation for X-ray, CT.</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">Nov 2023<br>Feb 2025</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_da.png" alt="Doctor Anywhere logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="4">DA Medsuites Orchard <span class="company-by">by Doctor Anywhere</span></button>
+<div class="timeline-details">Senior Radiographer / MOH CT section leader (Founding Team)<br>Joined multi services start-up during the phase of establishing imaging services, preparing radiological license application, writing and complete CT QA manual, hardware / software integration and workflow planning for operation launch.<br>Section leader for CT, daily operation for X-ray, DEXA, CT scans. Customer services for enquiry calls, communication with client clinics and handled appointments.</div>
+</div>
+</div>
+<div class="timeline-item">
+<div class="timeline-time">Nov 2025<br>April 2026</div>
+<div class="timeline-dot"><img class="timeline-logo" src="logo/logo_morrow.png" alt="MORROW Medical logo" /></div>
+<div>
+<button class="timeline-company" type="button" data-map-index="5">MORROW Medical <span class="company-by">by Seveno Capita</span></button>
+<div class="timeline-details">Radiographer / Section leader (Founding Team)<br>Lead radiographer for the operational setup of imaging service within a premium longevity and wellness flagship. Spearheaded the vendor evaluation and technical setup of radiological licensing, hardware/software installation, cloud-based PACS storage and teleradiology service network configuration.</div>
+</div>
+</div>
+</div>
+<div id="experience-callout" aria-live="polite">
+<div class="callout-shell">
+<div id="callout-period"></div>
+<div id="callout-company"></div>
+<div id="callout-role"></div>
+<div id="callout-body"></div>
+</div>
+</div>
+
+<div id="projects-stage" aria-hidden="true">
+<iframe class="projects-card-effect" src="card-swap-debug.html" title="Projects card showcase" allowtransparency="true"></iframe>
+</div>
+<div id="contact-stage" aria-hidden="true">
+<iframe class="contact-card-effect" src="tilted-card-contact-balls-only.html" title="Contact cards" allowtransparency="true"></iframe>
+</div>
+
+
+<div id="about-pixel-blast" class="pixel-blast-container" aria-hidden="true"></div>
+<div id="about-bling-field" aria-hidden="true">
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:10%;--bling-y:18%;--bling-size:26px;--bling-speed:2.7s;--bling-delay:-0.2s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:18%;--bling-y:42%;--bling-size:19px;--bling-speed:3.8s;--bling-delay:-1.1s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:27%;--bling-y:23%;--bling-size:22px;--bling-speed:4.5s;--bling-delay:-2.4s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:41%;--bling-y:14%;--bling-size:18px;--bling-speed:3.2s;--bling-delay:-0.8s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:83%;--bling-y:17%;--bling-size:24px;--bling-speed:3.5s;--bling-delay:-1.7s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:91%;--bling-y:35%;--bling-size:20px;--bling-speed:4.1s;--bling-delay:-0.4s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:79%;--bling-y:68%;--bling-size:17px;--bling-speed:2.9s;--bling-delay:-2.1s" />
+<img class="about-bling" src="bling.png" alt="" style="--bling-x:95%;--bling-y:72%;--bling-size:28px;--bling-speed:5.2s;--bling-delay:-3.3s" />
+</div>
+<button id="about-close-zone" type="button" aria-label="Back to main view"></button>
+<img id="about-sam-portrait" src="index_sam.png" alt="" />
+<div id="xray-film-container">
+<img class="xray-film-echo echo-a" src="xray_film.png" alt="" />
+<img class="xray-film-echo echo-b" src="xray_film.png" alt="" />
+<img class="xray-film-layer" src="xray_film.png" alt="" />
+<div id="about-text">
+<p><span id="about-title">Profession Summary</span><br><br>Senior CT Radiographer with 11+ years of experience across public hospitals, private practice, and premium screening start-ups — including direct involvement in launching new imaging services from licensing application through to full operational go-live.<br><br>Specialized in CT, including new scanner setup, optimized scan workflows (CTCA / I.G.S, etc.), split-bolus scan technique, quality assurance (dose monitoring and optimization), and protocol standardization.<br><br>A strong grounding in radiation physics and human physiology underpins my clinical approach, enabling me to understand not just pressing buttons, but why each protocol decision matters. This foundation allows me to adapt intelligently to optimize image quality, minimize dose, and serve the diagnostic purpose.</p>
+</div>
+</div>
+
+
+<div id="skill-session">
+<div id="skill-drag-hint">drag to view</div>
+<div id="skill-copy">
+<section class="skill-copy-section skill-copy-education">
+<h3 class="skill-copy-title">Education</h3>
+<div class="skill-edu-school-row">
+<p>Chung Shan Medical University, Taiwan</p>
+<span class="skill-edu-year">2007 - 2012</span>
+</div>
+<div class="skill-edu-degree">
+<span>Bachelor of Science</span>
+<span>Radiologic Science &amp; Medical Imaging</span>
+</div>
+<p>Highest scorer in Taiwan's 2012 national qualifying exam.</p>
+</section>
+<section class="skill-copy-section">
+<h3 class="skill-copy-title">Languages</h3>
+<p>English<br>Chinese / Mandarin<br>Japanese<br>Hokkien</p>
+</section>
+<section class="skill-copy-section">
+<h3 class="skill-copy-title">Core Skills</h3>
+<p>Advanced clinical knowledge<br>AI tools application<br>MOH / HCSA regulations<br>Healthcare setup and operations</p>
+</section>
+</div>
+<div class="skill-stage" id="skill-stage">
+<div class="skill-sphere" id="skill-sphere"></div>
+</div>
+<div class="skill-overlay"></div>
+<div class="skill-overlay-blur"></div>
+<div class="skill-edge-fade skill-edge-fade-top"></div>
+<div class="skill-edge-fade skill-edge-fade-bottom"></div>
+</div>
+
+<!-- contact session markup goes here. -->
+
+<div id="music-btn" title="Play/Pause" style="position:fixed;
+bottom:calc(12% + 12px);
+left:20px;
+z-index:30;
+width:48px;
+height:48px;
+cursor:pointer;
+">
+<div id="music-ring" style="position:absolute;
+inset:0;
+border-radius:50%;
+border:1.5px solid rgba(255,255,255,0.25);
+pointer-events:none;
+">
+</div>
+<svg viewBox="0 0 48 48" width="48" height="48" style="position:absolute;
+inset:0;
+filter:drop-shadow(0 0 6px rgba(255,200,50,0.7));
+pointer-events:none;
+">
+<polygon id="music-icon-play" points="19,16 19,32 32,24" fill="#fff" />
+<g id="music-icon-pause" fill="#fff" style="display:none">
+<rect x="17" y="15" width="5" height="18" rx="1" />
+<rect x="26" y="15" width="5" height="18" rx="1" />
+</g>
+</svg>
+</div>
+<button id="controls-toggle" title="Parameters">&#9881;
+</button>
+<div id="controls-panel">
+<h3>Letterbox</h3>
+<div class="ctrl-row">
+<label>Reveal speed (s)</label>
+<input type="range" id="ctrl-reveal-speed" min="0.5" max="5" step="0.1" value="2">
+<span class="val" id="val-reveal-speed">2</span>
+</div>
+<div class="ctrl-row">
+<label>Final bar height (%)</label>
+<input type="range" id="ctrl-bar-height" min="0" max="25" step="0.5" value="8.5">
+<span class="val" id="val-bar-height">8.5</span>
+</div>
+<h3>Starfield</h3>
+<div class="ctrl-row">
+<label>Star count</label>
+<input type="range" id="ctrl-star-count" min="50" max="800" step="5" value="800">
+<span class="val" id="val-star-count">800</span>
+</div>
+<div class="ctrl-row">
+<label>Star speed</label>
+<input type="range" id="ctrl-star-speed" min="0.1" max="3" step="0.05" value="1.25">
+<span class="val" id="val-star-speed">1.25</span>
+</div>
+<div class="ctrl-row">
+<label>Star opacity</label>
+<input type="range" id="ctrl-star-opacity" min="0.1" max="2" step="0.05" value="1.25">
+<span class="val" id="val-star-opacity">1.25</span>
+</div>
+<div class="ctrl-row">
+<label>Cursor warp strength</label>
+<input type="range" id="ctrl-warp-strength" min="0" max="80" step="2" value="0">
+<span class="val" id="val-warp-strength">0</span>
+</div>
+<div class="ctrl-row">
+<label>Warp radius</label>
+<input type="range" id="ctrl-warp-radius" min="50" max="400" step="10" value="200">
+<span class="val" id="val-warp-radius">200</span>
+</div>
+<h3>Atom – Orbits</h3>
+<div class="ctrl-row">
+<label>Orbit rx</label>
+<input type="range" id="ctrl-orbit-rx" min="80" max="250" step="2" value="220">
+<span class="val" id="val-orbit-rx">220</span>
+</div>
+<div class="ctrl-row">
+<label>Orbit ry</label>
+<input type="range" id="ctrl-orbit-ry" min="20" max="120" step="1" value="92">
+<span class="val" id="val-orbit-ry">92</span>
+</div>
+<div class="ctrl-row">
+<label>Track 1 speed</label>
+<input type="range" id="ctrl-orbit-speed1" min="0" max="2" step="0.02" value="0.36">
+<span class="val" id="val-orbit-speed1">0.36</span>
+</div>
+<div class="ctrl-row">
+<label>Track 2 speed</label>
+<input type="range" id="ctrl-orbit-speed2" min="0" max="2" step="0.02" value="0.34">
+<span class="val" id="val-orbit-speed2">0.34</span>
+</div>
+<div class="ctrl-row">
+<label>Track 3 speed</label>
+<input type="range" id="ctrl-orbit-speed3" min="0" max="2" step="0.02" value="0.38">
+<span class="val" id="val-orbit-speed3">0.38</span>
+</div>
+<div class="ctrl-row">
+<label>Track 4 speed</label>
+<input type="range" id="ctrl-orbit-speed4" min="0" max="2" step="0.02" value="0.38">
+<span class="val" id="val-orbit-speed4">0.38</span>
+</div>
+<h3>Name Ring</h3>
+<div class="ctrl-row">
+<label>Ring radius</label>
+<input type="range" id="ctrl-name-radius" min="60" max="140" step="2" value="95">
+<span class="val" id="val-name-radius">95</span>
+</div>
+<div class="ctrl-row">
+<label>Font size</label>
+<input type="range" id="ctrl-name-size" min="8" max="28" step="0.5" value="20">
+<span class="val" id="val-name-size">20</span>
+</div>
+<div class="ctrl-row">
+<label>Opacity</label>
+<input type="range" id="ctrl-name-opacity" min="0.1" max="1" step="0.05" value="0.45">
+<span class="val" id="val-name-opacity">0.45</span>
+</div>
+<div class="ctrl-row">
+<label>Rotate speed</label>
+<input type="range" id="ctrl-name-speed" min="-30" max="30" step="1" value="12">
+<span class="val" id="val-name-speed">12</span>
+</div>
+<h3>Atom – Electrons</h3>
+<div class="ctrl-row">
+<label>Electron speed</label>
+<input type="range" id="ctrl-electron-speed" min="0.1" max="4" step="0.05" value="0.1">
+<span class="val" id="val-electron-speed">0.1</span>
+</div>
+<div class="ctrl-row">
+<label>Nucleus size</label>
+<input type="range" id="ctrl-nucleus-size" min="2" max="12" step="0.5" value="5.5">
+<span class="val" id="val-nucleus-size">4</span>
+</div>
+<div class="ctrl-row">
+<label>Nucleus opacity</label>
+<input type="range" id="ctrl-nucleus-opacity" min="0.1" max="1" step="0.05" value="0.6">
+<span class="val" id="val-nucleus-opacity">0.85</span>
+</div>
+<div class="ctrl-row">
+<label>Nucleus glow</label>
+<input type="range" id="ctrl-nucleus-glow" min="20" max="80" step="1" value="70">
+<span class="val" id="val-nucleus-glow">45</span>
+</div>
+<h3>Xray Film</h3>
+<div class="ctrl-row">
+<label>Film size</label>
+<input type="range" id="ctrl-xray-size" min="0.5" max="3" step="0.05" value="1">
+<span class="val" id="val-xray-size">1</span>
+</div>
+<div class="ctrl-row">
+<label>Film x shift (%)</label>
+<input type="range" id="ctrl-xray-shift" min="-100" max="100" step="1" value="0">
+<span class="val" id="val-xray-shift">0</span>
+</div>
+<div class="ctrl-row">
+<label>Text frame (%)</label>
+<input type="range" id="ctrl-about-width" min="25" max="90" step="0.1" value="82">
+<span class="val" id="val-about-width">82</span>
+</div>
+<div class="ctrl-row">
+<label>Text size</label>
+<input type="range" id="ctrl-about-size" min="0.5" max="2" step="0.01" value="0.875">
+<span class="val" id="val-about-size">0.875</span>
+</div>
+<div class="btn-row">
+<button id="btn-reset">Reset defaults</button>
+<button id="btn-replay" class="primary">Replay intro</button>
+</div>
+</div>
+<script>
+(function(){try{
+// ============================================================
+// PARAMETERS
+// ============================================================
+const params = {
+  revealSpeed: 2, barHeight: 8.5,
+  starCount: 800, starSpeedMul: 1.25, starOpacityMul: 0.75,
+  warpStrength: 0, warpRadius: 200,
+  orbitRx: 220, orbitRy: 92,
+  orbitSpeed1: 0.36, orbitSpeed2: 0.34, orbitSpeed3: 0.38, orbitSpeed4: 0.38, orbitSpeed5: 0.35,
+  electronSpeed: 0.1, nucleusSize: 5.5, nucleusGlow: 70, nucleusOpacity: 0.6,
+  nameRingRadius: 95, nameFontSize: 20, nameOpacity: 0.45, nameRotSpeed: 12
+};
+const ORBIT_BASE_ANGLES = [-45, 75, 195, 285, 20];  // Planets start from different directions
+const PHASE_OFFSETS = [Math.PI*0.1, Math.PI*0.6, Math.PI*1.2, Math.PI*1.7, Math.PI*1.45];  // Varied starting positions
+const eState = [
+  { phase: PHASE_OFFSETS[0], frozen: null, boost: 1 },
+  { phase: PHASE_OFFSETS[1], frozen: null, boost: 1 },
+  { phase: PHASE_OFFSETS[2], frozen: null, boost: 1 },
+  { phase: PHASE_OFFSETS[3], frozen: null, boost: 1 },
+  { phase: PHASE_OFFSETS[4], frozen: null, boost: 1 }
+];
+
+// ============================================================
+// CANVAS STARFIELD
+// ============================================================
+const canvas = document.getElementById('bg-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+let mouseCX = -500, mouseCY = -500;
+let stars = [];
+
+function rebuildStars() {
+  stars = [];
+  for (let i = 0; i < params.starCount; i++) {
+    const rng = ((i * 137.508 + 7) % 100) / 100;
+    const sizeClass = rng < 0.7 ? 0 : rng < 0.93 ? 1 : 2;
+    const sizes = [[0.2, 1.2], [1.0, 2.5], [0.1, 0.4]];
+    const [lo, hi] = sizes[sizeClass];
+    stars.push({
+      seedAngle: ((i * 137.508) % 360) * (Math.PI / 180),
+      seedRadius: ((i * 31 + 17) % 50) / 50,
+      speed: (0.15 + ((i * 7 + 3) % 15) / 30) * params.starSpeedMul,
+      baseSize: (lo + ((i * 13 + 5) % 100) / 100 * (hi - lo)) * params.starOpacityMul,
+      phase: ((i * 15 + (i % 7) * 20) % 100) / 100,
+      warmth: ((i * 73 + 11) % 100) / 100
+    });
+  }
+}
+rebuildStars();
+
+function resize() {
+  W = canvas.width = window.innerWidth * devicePixelRatio;
+  H = canvas.height = window.innerHeight * devicePixelRatio;
+  rebuildStars();
+}
+window.addEventListener('resize', resize);
+resize();
+
+canvas.addEventListener('mousemove', function(e) {
+  mouseCX = e.clientX * devicePixelRatio;
+  mouseCY = e.clientY * devicePixelRatio;
+});
+canvas.addEventListener('mouseleave', function() {
+  mouseCX = -500;
+  mouseCY = -500;
+});
+
+function drawStarfield(time) {
+  ctx.clearRect(0, 0, W, H);
+  var cx = W / 2, cy = H / 2;
+  var maxR = Math.max(cx, cy) * 1.3;
+  for (var si = 0; si < stars.length; si++) {
+    var s = stars[si];
+    var progress = ((time * s.speed + s.phase) % 5) / 5;
+    var radius = s.seedRadius * 15 + progress * maxR;
+    var sx = cx + Math.cos(s.seedAngle) * radius;
+    var sy = cy + Math.sin(s.seedAngle) * radius;
+    var wdx = sx - mouseCX, wdy = sy - mouseCY;
+    var wdist = Math.hypot(wdx, wdy);
+    if (wdist < params.warpRadius && wdist > 0.1) {
+      var t = 1 - wdist / params.warpRadius;
+      var pull = t * t * params.warpStrength;
+      sx += (mouseCX - sx) * pull / wdist;
+      sy += (mouseCY - sy) * pull / wdist;
+    }
+    var scale = 1 + progress * 1.5;
+    var size = s.baseSize * scale;
+    var op = Math.min(progress * 3, 1) * Math.max(1 - progress * 0.85, 0.12);
+    var warm = s.warmth;
+    var r = Math.floor(220 + warm * 35);
+    var gCol = Math.floor(225 - warm * 25);
+    var b = Math.floor(240 - warm * 50);
+    ctx.shadowBlur = size * 4.5;
+    ctx.shadowColor = 'rgba(' + r + ',' + gCol + ',' + b + ',0.85)';
+    ctx.fillStyle = 'rgb(' + r + ',' + gCol + ',' + b + ')';
+    ctx.globalAlpha = op;
+    ctx.beginPath();
+    ctx.arc(sx, sy, size, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+    if (size > 1.8) {
+      var gl = ctx.createRadialGradient(sx, sy, 0, sx, sy, size * 3.2);
+      gl.addColorStop(0, 'rgba(' + r + ',' + gCol + ',' + b + ',0.38)');
+      gl.addColorStop(0.45, 'rgba(180,210,255,0.12)');
+      gl.addColorStop(1, 'rgba(180,200,255,0)');
+      ctx.fillStyle = gl;
+      ctx.beginPath();
+      ctx.arc(sx, sy, size * 3.2, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+
+// ============================================================
+// SVG ELEMENTS
+// ============================================================
+var orbitEls = document.querySelectorAll('#orbits-group ellipse');
+var particleGroups = document.querySelectorAll('#particles-group > g');
+var nucleusImg = document.getElementById('nucleus-img');
+var nucleusHaze2 = document.getElementById('nucleus-haze2');
+var nucleusHaze = document.getElementById('nucleus-haze');
+var nucleusGlow1 = document.getElementById('nucleus-glow1');
+var nucleusGlow2 = document.getElementById('nucleus-glow2');
+var svgEl = document.getElementById('atom-svg');
+
+// ============================================================
+// SVG MOUSE (for electron hover/click)
+// ============================================================
+var mouseSX = -100, mouseSY = -100;
+var hoveredIdx = -1;
+
+svgEl.addEventListener('mousemove', function(e) {
+  var r = svgEl.getBoundingClientRect();
+  var s = 600 / r.width;
+  mouseSX = (e.clientX - r.left) * s;
+  mouseSY = (e.clientY - r.top) * s;
+});
+svgEl.addEventListener('mouseleave', function() {
+  mouseSX = -100; mouseSY = -100;
+  hoveredIdx = -1;
+  for (var i = 0; i < eState.length; i++) {
+    eState[i].frozen = null;
+    var label = document.getElementById('el-label-' + i);
+    if (label) label.classList.remove('show');
+  }
+});
+
+// Planet images for each link
+var PLANET_IMAGES = [
+  'bg1.png',
+  'bg2.png',
+  'bg3.png',
+  'bg4.png',
+  'bg5.png'
+];
+var activeSession = -1;
+var aboutFilmTimer = null;
+var aboutTextTimer = null;
+var aboutSwingTimer = null;
+var aboutExitTimer = null;
+var aboutScrambleFrame = null;
+var experienceLineFrame = null;
+var experienceLines = [];
+var experienceCalloutTimer = null;
+
+function hideProjectsSession() {
+  var projectsStage = document.getElementById('projects-stage');
+  var planetBackdrop = document.getElementById('planet-backdrop');
+  if (svgEl) svgEl.classList.remove('projects-visible');
+  if (projectsStage) projectsStage.classList.remove('active');
+  if (planetBackdrop) planetBackdrop.classList.remove('projects-session-bg');
+}
+
+function showProjectsSession() {
+  var projectsStage = document.getElementById('projects-stage');
+  var planetBackdrop = document.getElementById('planet-backdrop');
+  if (svgEl) svgEl.classList.add('projects-visible');
+  if (projectsStage) projectsStage.classList.add('active');
+  if (planetBackdrop) planetBackdrop.classList.add('projects-session-bg');
+}
+
+function hideContactSession() {
+  var contactStage = document.getElementById('contact-stage');
+  var planetBackdrop = document.getElementById('planet-backdrop');
+  if (contactStage) contactStage.classList.remove('active');
+  if (planetBackdrop) planetBackdrop.classList.remove('clear-session-bg');
+  stopContactStrands();
+}
+
+function showContactSession() {
+  var contactStage = document.getElementById('contact-stage');
+  var planetBackdrop = document.getElementById('planet-backdrop');
+  if (contactStage) contactStage.classList.add('active');
+  if (planetBackdrop) planetBackdrop.classList.add('clear-session-bg');
+  startContactStrands();
+}
+
+var contactStrandsConfig = {
+  density: 24,
+  speed: 0.65,
+  opacity: 0.28,
+  amplitude: 32,
+  glow: 16
+};
+var contactStrandsFrame = null;
+var contactStrandsCtx = null;
+var contactStrandsCanvas = null;
+var contactStrandsDpr = 1;
+
+function resizeContactStrands() {
+  contactStrandsCanvas = contactStrandsCanvas || document.getElementById('contact-strands-canvas');
+  if (!contactStrandsCanvas) return false;
+  contactStrandsDpr = Math.min(window.devicePixelRatio || 1, 2);
+  var rect = contactStrandsCanvas.getBoundingClientRect();
+  contactStrandsCanvas.width = Math.max(1, Math.floor(rect.width * contactStrandsDpr));
+  contactStrandsCanvas.height = Math.max(1, Math.floor(rect.height * contactStrandsDpr));
+  contactStrandsCtx = contactStrandsCanvas.getContext('2d');
+  return !!contactStrandsCtx;
+}
+
+function drawContactStrands(now) {
+  if (!contactStrandsCtx && !resizeContactStrands()) return;
+  var canvas = contactStrandsCanvas;
+  var ctx = contactStrandsCtx;
+  var width = canvas.width;
+  var height = canvas.height;
+  var cfg = contactStrandsConfig;
+  var time = now * 0.001 * cfg.speed;
+  ctx.clearRect(0, 0, width, height);
+  ctx.lineCap = 'round';
+  ctx.lineJoin = 'round';
+  ctx.globalCompositeOperation = 'lighter';
+  var count = Math.max(1, Math.floor(cfg.density));
+  var gap = height / (count + 1);
+  var amp = cfg.amplitude * contactStrandsDpr;
+  var glow = cfg.glow * contactStrandsDpr;
+  for (var i = 0; i < count; i++) {
+    var yBase = gap * (i + 1);
+    var hueShift = i / Math.max(1, count - 1);
+    var alpha = cfg.opacity * (0.45 + hueShift * 0.55);
+    ctx.beginPath();
+    for (var x = -30 * contactStrandsDpr; x <= width + 30 * contactStrandsDpr; x += 22 * contactStrandsDpr) {
+      var waveA = Math.sin(x * 0.006 + time * 2.3 + i * 0.38);
+      var waveB = Math.sin(x * 0.014 - time * 1.6 + i * 0.77);
+      var y = yBase + (waveA * 0.72 + waveB * 0.28) * amp;
+      if (x <= -30 * contactStrandsDpr) ctx.moveTo(x, y);
+      else ctx.lineTo(x, y);
+    }
+    var gradient = ctx.createLinearGradient(0, yBase - amp, width, yBase + amp);
+    gradient.addColorStop(0, 'rgba(100,190,255,' + (alpha * 0.5).toFixed(3) + ')');
+    gradient.addColorStop(0.5, 'rgba(255,255,255,' + alpha.toFixed(3) + ')');
+    gradient.addColorStop(1, 'rgba(142,255,221,' + (alpha * 0.55).toFixed(3) + ')');
+    ctx.strokeStyle = gradient;
+    ctx.lineWidth = (0.7 + hueShift * 1.2) * contactStrandsDpr;
+    ctx.shadowBlur = glow;
+    ctx.shadowColor = 'rgba(145,220,255,' + Math.min(0.42, alpha * 1.2).toFixed(3) + ')';
+    ctx.stroke();
+  }
+  ctx.shadowBlur = 0;
+  ctx.globalCompositeOperation = 'source-over';
+  contactStrandsFrame = requestAnimationFrame(drawContactStrands);
+}
+
+function startContactStrands() {
+  if (!resizeContactStrands() || contactStrandsFrame) return;
+  contactStrandsFrame = requestAnimationFrame(drawContactStrands);
+}
+
+function stopContactStrands() {
+  if (contactStrandsFrame) cancelAnimationFrame(contactStrandsFrame);
+  contactStrandsFrame = null;
+}
+
+window.addEventListener('resize', function() {
+  if (contactStrandsFrame) resizeContactStrands();
+});
+
+['density','speed','opacity','amplitude','glow'].forEach(function(key) {
+  var input = document.getElementById('ctrl-contact-strands-' + key);
+  var value = document.getElementById('val-contact-strands-' + key);
+  if (!input) return;
+  input.addEventListener('input', function() {
+    var next = parseFloat(input.value);
+    contactStrandsConfig[key] = next;
+    if (value) value.textContent = next;
+  });
+});
+
+window.SKILL_SESSION_CONFIG = {
+  params: {
+    radius: 482,
+    segmentsX: 18,
+    segmentsY: 10,
+    capsuleHeight: 35,
+    capsuleGapX: 10,
+    capsuleGap: 9,
+    capsulePadX: 18,
+    fontSize: 14,
+    perspective: 1250,
+    viewSize: 86,
+    rotateX: -1,
+    rotateY: 28,
+    rotateZ: 0,
+    frontArcX: 118,
+    frontArcY: 73,
+    drift: 0.47,
+    blink: 0.5,
+    blinkMin: 0.05,
+    textReveal: 0.35,
+    edgeFadeSize: 175,
+    overlayInner: 80,
+    overlayMid: 95,
+    overlayBlurStart: 53,
+    overlayBlurEnd: 88,
+    blurStrength: 2.5
+  },
+  skills: [
+    'CT Imaging',
+    'Protocol Design',
+    'Dose Optimization',
+    'Quality Assurance',
+    'Scanner Setup',
+    'Imaging Operations',
+    'Service Launch',
+    'Clinical Decision-Making',
+    'Radiation Physics',
+    'Human Physiology',
+    'CTCA Workflows',
+    'Split-Bolus Techniques',
+    'MOH Licensing',
+    'HCSA Compliance',
+    'Vendor Evaluation',
+    'PACS Integration',
+    'Teleradiology Setup',
+    'Workflow Planning',
+    'QA Manuals',
+    'General Radiography',
+    'X-Ray Operations',
+    'DEXA Operations',
+    'Fluoroscopy Support',
+    'Guided Procedures',
+    'Screening Operations',
+    'Section Leadership',
+    'Founding Team Buildout',
+    'Clinic Coordination',
+    'Client Communication',
+    'AI Tool Use',
+    'Healthcare Setup',
+    'Quality Improvement',
+    'Emergency Imaging',
+    'NICU Dose Reduction'
+  ]
+};
+
+(function() {
+  var skillBuilt = false;
+  var skillFrame = null;
+  var skillTextTimer = null;
+  var skillDrag = {
+    active: false,
+    pointerId: null,
+    startX: 0,
+    startY: 0,
+    baseRotateX: 0,
+    baseRotateY: 0,
+    offsetX: 0,
+    offsetY: 0
+  };
+  var skillScrambleFrame = null;
+
+  function skillConfig() {
+    return (window.SKILL_SESSION_CONFIG && window.SKILL_SESSION_CONFIG.params) || {};
+  }
+
+  function skillList() {
+    return (window.SKILL_SESSION_CONFIG && window.SKILL_SESSION_CONFIG.skills) || [];
+  }
+
+  function applySkillVars() {
+    var root = document.getElementById('skill-session');
+    if (!root) return null;
+    var params = skillConfig();
+    root.style.setProperty('--skill-radius', params.radius + 'px');
+    root.style.setProperty('--skill-capsule-height', params.capsuleHeight + 'px');
+    root.style.setProperty('--skill-capsule-pad-x', params.capsulePadX + 'px');
+    root.style.setProperty('--skill-font-size', params.fontSize + 'px');
+    root.style.setProperty('--skill-view-size', (params.viewSize * 1.5) + 'vmin');
+    root.style.setProperty('--skill-edge-fade-size', params.edgeFadeSize + 'px');
+    root.style.setProperty('--skill-overlay-inner', params.overlayInner + '%');
+    root.style.setProperty('--skill-overlay-mid', params.overlayMid + '%');
+    root.style.setProperty('--skill-overlay-blur-start', params.overlayBlurStart + '%');
+    root.style.setProperty('--skill-overlay-blur-end', params.overlayBlurEnd + '%');
+    root.style.setProperty('--skill-blur-strength', params.blurStrength + 'px');
+    var stage = document.getElementById('skill-stage');
+    if (stage) stage.style.perspective = params.perspective + 'px';
+    return root;
+  }
+
+  function setSkillAnnotationLayout(nextValues) {
+    var root = document.getElementById('skill-session');
+    if (!root || !nextValues) return;
+    var map = {
+      hintLeft: '--skill-hint-left',
+      hintTop: '--skill-hint-top',
+      hintShiftX: '--skill-hint-shift-x',
+      hintShiftY: '--skill-hint-shift-y',
+      copyLeft: '--skill-copy-left',
+      copyTop: '--skill-copy-top',
+      copyShiftY: '--skill-copy-shift-y',
+      copyWidth: '--skill-copy-width'
+    };
+    Object.keys(map).forEach(function(key) {
+      if (nextValues[key] !== undefined && nextValues[key] !== null) {
+        root.style.setProperty(map[key], String(nextValues[key]));
+      }
+    });
+  }
+
+  function resetSkillAnnotationLayout() {
+    var root = document.getElementById('skill-session');
+    if (!root) return;
+    [
+      '--skill-hint-left',
+      '--skill-hint-top',
+      '--skill-hint-shift-x',
+      '--skill-hint-shift-y',
+      '--skill-copy-left',
+      '--skill-copy-top',
+      '--skill-copy-shift-y',
+      '--skill-copy-width'
+    ].forEach(function(name) {
+      root.style.removeProperty(name);
+    });
+  }
+
+  function eachSkillTextNode(root, callback) {
+    if (!root) return;
+    var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node) {
+        return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+      }
+    });
+    var nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(callback);
+  }
+
+  function resetSkillScramble(root) {
+    if (skillScrambleFrame) cancelAnimationFrame(skillScrambleFrame);
+    skillScrambleFrame = null;
+    eachSkillTextNode(root, function(node) {
+      if (node._originalText) node.nodeValue = node._originalText;
+    });
+  }
+
+  function playSkillScramble(root) {
+    resetSkillScramble(root);
+    if (!root) return;
+    var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/.+-';
+    var nodes = [];
+    eachSkillTextNode(root, function(node) {
+      node._originalText = node._originalText || node.nodeValue;
+      nodes.push({ node: node, text: node._originalText });
+    });
+    var started = performance.now();
+    var duration = 1867;
+
+    function tick(now) {
+      var progress = Math.min((now - started) / duration, 1);
+      nodes.forEach(function(item, index) {
+        var text = item.text;
+        var localProgress = Math.max(0, Math.min((progress - index * 0.03) / 0.9, 1));
+        var reveal = Math.floor(text.length * localProgress);
+        var out = '';
+        for (var i = 0; i < text.length; i++) {
+          var ch = text.charAt(i);
+          if (i < reveal || /\s/.test(ch)) {
+            out += ch;
+          } else {
+            out += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+        }
+        item.node.nodeValue = out;
+      });
+      if (progress < 1) {
+        skillScrambleFrame = requestAnimationFrame(tick);
+      } else {
+        nodes.forEach(function(item) { item.node.nodeValue = item.text; });
+        skillScrambleFrame = null;
+      }
+    }
+
+    skillScrambleFrame = requestAnimationFrame(tick);
+  }
+
+  function buildSkillItems() {
+    var sphere = document.getElementById('skill-sphere');
+    var params = skillConfig();
+    var skills = skillList();
+    if (!sphere || !skills.length) return;
+    sphere.innerHTML = '';
+
+    var sx = Math.round(params.segmentsX);
+    var sy = Math.round(params.segmentsY);
+    var frontSpanX = Math.min(170, params.frontArcX);
+    var frontSpanY = Math.min(140, params.frontArcY);
+    var positions = [];
+
+    for (var row = 0; row < sy; row++) {
+      var rowLabels = [];
+      var rowT = sy <= 1 ? 0.5 : row / (sy - 1);
+      var normY = (rowT - 0.5) * 2;
+      var rowRadius = Math.sqrt(Math.max(0, 1 - normY * normY));
+      var visibleWidth = rowRadius * params.radius * Math.sin(frontSpanX * Math.PI / 360) * 2;
+      var widthBudget = Math.max(120, visibleWidth - params.capsuleGapX * 2);
+      var usedWidth = 0;
+
+      for (var col = 0; col < sx; col++) {
+        var label = skills[(row * sx + col) % skills.length];
+        var width = Math.max(58, label.length * 9.2 + 38);
+        var slotCost = (rowLabels.length ? params.capsuleGapX : 0) + width;
+        if (rowLabels.length && usedWidth + slotCost > widthBudget) break;
+        rowLabels.push({ label: label, width: width });
+        usedWidth += slotCost;
+      }
+
+      var totalRowWidth = rowLabels.reduce(function(sum, item) {
+        return sum + item.width;
+      }, 0) + Math.max(0, rowLabels.length - 1) * params.capsuleGapX;
+      var cursor = totalRowWidth * -0.5;
+      var rowCount = rowLabels.length;
+
+      for (var x = 0; x < rowCount; x++) {
+        var itemData = rowLabels[x];
+        cursor += itemData.width * 0.5;
+        var normX = visibleWidth <= 1 ? 0 : Math.max(-1, Math.min(1, cursor / (visibleWidth * 0.5)));
+        var radial = Math.sqrt(normX * normX + normY * normY);
+        if (radial > 1) continue;
+        var edgeCompress = Math.sqrt(Math.max(0, 1 - normY * normY * 0.55));
+        var rotY = normX * (frontSpanX * 0.36) * edgeCompress;
+        var rotX = normY * (frontSpanY * 0.5);
+        positions.push({
+          row: row,
+          col: x,
+          rotY: rotY,
+          rotX: rotX,
+          priority: radial
+        });
+        cursor += itemData.width * 0.5 + params.capsuleGapX;
+      }
+    }
+
+    positions.sort(function(a, b) {
+      return a.priority - b.priority;
+    });
+
+    positions.forEach(function(position, index) {
+      var item = document.createElement('div');
+      var inner = document.createElement('div');
+      var text = document.createElement('span');
+      item.className = 'skill-item';
+      inner.className = 'skill-item-inner';
+      text.textContent = skills[index % skills.length];
+      item.style.transform =
+        'rotateY(' + position.rotY + 'deg) ' +
+        'rotateX(' + position.rotX + 'deg) ' +
+        'translateZ(' + params.radius + 'px)';
+      item.style.zIndex = String(1000 - Math.round(position.priority * 100));
+      item.dataset.seed = (index * 0.77 + position.col * 0.13 + position.row * 0.19).toFixed(3);
+      inner.appendChild(text);
+      item.appendChild(inner);
+      sphere.appendChild(item);
+    });
+  }
+
+  function stopSkillEvent(event) {
+    event.preventDefault();
+    event.stopPropagation();
+  }
+
+  function bindSkillInteractions() {
+    var root = document.getElementById('skill-session');
+    var stage = document.getElementById('skill-stage');
+    var copy = document.getElementById('skill-copy');
+    if (!root || !stage || stage.dataset.bound === 'true') return;
+    stage.dataset.bound = 'true';
+
+    root.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    if (copy) {
+      copy.addEventListener('click', function(event) {
+        event.stopPropagation();
+      });
+      copy.addEventListener('pointerdown', function(event) {
+        event.stopPropagation();
+      });
+    }
+
+    stage.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+
+    stage.addEventListener('pointerdown', function(event) {
+      stopSkillEvent(event);
+      skillDrag.active = true;
+      skillDrag.pointerId = event.pointerId;
+      skillDrag.startX = event.clientX;
+      skillDrag.startY = event.clientY;
+      skillDrag.baseRotateX = skillDrag.offsetX;
+      skillDrag.baseRotateY = skillDrag.offsetY;
+      stage.classList.add('is-dragging');
+      if (stage.setPointerCapture) stage.setPointerCapture(event.pointerId);
+    });
+
+    stage.addEventListener('pointermove', function(event) {
+      if (!skillDrag.active || event.pointerId !== skillDrag.pointerId) return;
+      stopSkillEvent(event);
+      var deltaX = event.clientX - skillDrag.startX;
+      var deltaY = event.clientY - skillDrag.startY;
+      skillDrag.offsetY = skillDrag.baseRotateY + deltaX * 0.08;
+      skillDrag.offsetX = skillDrag.baseRotateX - deltaY * 0.05;
+    });
+
+    function endDrag(event) {
+      if (!skillDrag.active || event.pointerId !== skillDrag.pointerId) return;
+      stopSkillEvent(event);
+      skillDrag.active = false;
+      skillDrag.pointerId = null;
+      stage.classList.remove('is-dragging');
+      if (stage.releasePointerCapture) {
+        try {
+          stage.releasePointerCapture(event.pointerId);
+        } catch (error) {}
+      }
+    }
+
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+    stage.addEventListener('pointerleave', function(event) {
+      if (!skillDrag.active) return;
+      if (event.buttons === 0) endDrag(event);
+    });
+  }
+
+  function animateSkill(now) {
+    var root = document.getElementById('skill-session');
+    var sphere = document.getElementById('skill-sphere');
+    if (!root || !sphere) return;
+    var params = skillConfig();
+    var swayY = Math.sin(now * 0.00045) * params.drift * 18;
+    var swayX = Math.sin(now * 0.00023 + 0.8) * params.drift * 10;
+    sphere.style.setProperty('--skill-sphere-x', (params.rotateX + skillDrag.offsetX + swayX) + 'deg');
+    sphere.style.setProperty('--skill-sphere-y', (-30 + params.rotateY + skillDrag.offsetY + swayY) + 'deg');
+    sphere.style.setProperty('--skill-sphere-z', (-30 + params.rotateZ) + 'deg');
+
+    sphere.querySelectorAll('.skill-item').forEach(function(item) {
+      var seed = Number(item.dataset.seed);
+      var cycleMs = 7000 / Math.max(0.01, params.blink);
+      var phase = (now + seed * 997) % cycleMs;
+      var opacity = 0;
+      if (phase < 1000) {
+        opacity = phase / 1000;
+      } else if (phase < 3500) {
+        opacity = 1;
+      } else if (phase < 4500) {
+        opacity = 1 - ((phase - 3500) / 1000);
+      } else {
+        opacity = 0;
+      }
+      var blinkValue = params.blinkMin + opacity * (0.98 - params.blinkMin);
+      var textOpacity = 0;
+      if (blinkValue >= params.textReveal) {
+        textOpacity = 1;
+      } else if (blinkValue > params.textReveal - 0.14) {
+        textOpacity = (blinkValue - (params.textReveal - 0.14)) / 0.14;
+      }
+      var inner = item.querySelector('.skill-item-inner');
+      if (!inner) return;
+      inner.style.setProperty('--skill-blink', blinkValue.toFixed(3));
+      inner.style.setProperty('--skill-text-blink', textOpacity.toFixed(3));
+    });
+
+    skillFrame = requestAnimationFrame(animateSkill);
+  }
+
+  function ensureSkillSession() {
+    if (skillBuilt) return;
+    if (!applySkillVars()) return;
+    buildSkillItems();
+    bindSkillInteractions();
+    skillBuilt = true;
+    if (!skillFrame) skillFrame = requestAnimationFrame(animateSkill);
+  }
+
+  window.showSkillSession = function() {
+    ensureSkillSession();
+    var root = document.getElementById('skill-session');
+    var copy = document.getElementById('skill-copy');
+    if (skillTextTimer) clearTimeout(skillTextTimer);
+    if (copy) resetSkillScramble(copy);
+    if (root) root.classList.add('active');
+    skillTextTimer = setTimeout(function() {
+      if (copy && root && root.classList.contains('active')) playSkillScramble(copy);
+      skillTextTimer = null;
+    }, 300);
+  };
+
+  window.hideSkillSession = function() {
+    var root = document.getElementById('skill-session');
+    var copy = document.getElementById('skill-copy');
+    if (skillTextTimer) clearTimeout(skillTextTimer);
+    skillTextTimer = null;
+    if (copy) resetSkillScramble(copy);
+    if (root) root.classList.remove('active');
+  };
+
+  window.setSkillAnnotationLayout = setSkillAnnotationLayout;
+  window.resetSkillAnnotationLayout = resetSkillAnnotationLayout;
+})();
+
+window.EXPERIENCES_SESSION_CONFIG = {
+  stripWidths: [3, 2, 7, 2, 4, 2, 18, 2, 5, 2, 3, 28, 2, 6, 3, 44, 2, 4, 2, 8, 3, 2, 22, 2, 5, 3, 2, 12, 2, 36, 3, 2, 6, 2, 16, 2, 5, 3, 2, 30]
+};
+
+function hideExperienceCallout() {
+  var callout = document.getElementById('experience-callout');
+  if (!callout) return;
+  if (experienceCalloutTimer) clearTimeout(experienceCalloutTimer);
+  experienceCalloutTimer = null;
+  if (!callout.classList.contains('active')) return;
+  callout.classList.add('exiting');
+  callout.classList.remove('active');
+  experienceCalloutTimer = setTimeout(function() {
+    callout.classList.remove('exiting');
+  }, 360);
+}
+
+function showExperienceCallout(button) {
+  var item = button.closest('.timeline-item');
+  var callout = document.getElementById('experience-callout');
+  var detail = item ? item.querySelector('.timeline-details') : null;
+  if (!item || !callout || !detail) return;
+  var parts = detail.innerHTML.split(/<br\s*\/?>/i).map(function(part) {
+    return part.trim();
+  }).filter(Boolean);
+  document.getElementById('callout-period').innerHTML = item.querySelector('.timeline-time').innerHTML.replace('<br>', ' - ');
+  var companyEl = document.getElementById('callout-company');
+  var byEl = button.querySelector('.company-by');
+  var companyName = button.childNodes[0] ? button.childNodes[0].nodeValue.replace(/\s+/g, ' ').trim() : button.textContent.replace(/\s+/g, ' ').trim();
+  companyEl.innerHTML = '';
+  companyEl.appendChild(document.createTextNode(companyName));
+  if (byEl) {
+    var calloutBy = document.createElement('span');
+    calloutBy.className = 'callout-by';
+    calloutBy.textContent = byEl.textContent.replace(/\s+/g, ' ').trim();
+    companyEl.appendChild(calloutBy);
+  }
+  document.getElementById('callout-role').textContent = parts.shift() || '';
+  document.getElementById('callout-body').textContent = parts.join(' ');
+  if (experienceCalloutTimer) clearTimeout(experienceCalloutTimer);
+  callout.classList.remove('active');
+  callout.classList.add('exiting');
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      callout.classList.remove('exiting');
+      callout.classList.add('active');
+    });
+  });
+}
+
+function hideExperienceLines() {
+  if (experienceLineFrame) cancelAnimationFrame(experienceLineFrame);
+  experienceLineFrame = null;
+  var layer = document.getElementById('experience-lines');
+  if (layer) layer.classList.remove('active');
+  var timeline = document.getElementById('experience-timeline');
+  var map = document.getElementById('sg-map');
+  if (timeline) timeline.classList.remove('active');
+  if (map) map.classList.remove('active', 'focused');
+  document.querySelectorAll('.timeline-item.zoomed').forEach(function(item) {
+    item.classList.remove('zoomed');
+  });
+  document.querySelectorAll('.sg-pin.active').forEach(function(pin) {
+    pin.classList.remove('active');
+  });
+  hideExperienceCallout();
+}
+
+function showExperienceLines() {
+  hideExperienceLines();
+  var layer = document.getElementById('experience-lines');
+  if (!layer) return;
+  var stripWidths = (window.EXPERIENCES_SESSION_CONFIG && window.EXPERIENCES_SESSION_CONFIG.stripWidths) || [3, 2, 7, 2, 4, 2, 18, 2, 5, 2, 3, 28, 2, 6, 3, 44, 2, 4, 2, 8, 3, 2, 22, 2, 5, 3, 2, 12, 2, 36, 3, 2, 6, 2, 16, 2, 5, 3, 2, 30];
+  layer.innerHTML = '';
+  experienceLines = [];
+  for (var i = 0; i < stripWidths.length; i++) {
+    var line = document.createElement('div');
+    line.className = 'experience-line';
+    var stripLeft = (i * 97) % 100;
+    var stripWidth = stripLeft > 66 ? Math.max(1, stripWidths[i] / 3) : stripWidths[i];
+    line.style.left = stripLeft + 'vw';
+    line.style.width = stripWidth + 'px';
+    line.style.opacity = (stripWidths[i] > 20 ? '0.19' : '0.5');
+    line.style.transform = 'none';
+    layer.appendChild(line);
+    experienceLines.push({
+      el: line,
+      seed: Math.random() * 1000,
+      target: 0.55 + Math.random() * 0.65,
+      current: 1
+    });
+  }
+  layer.classList.add('active');
+  var timeline = document.getElementById('experience-timeline');
+  var map = document.getElementById('sg-map');
+  if (timeline) timeline.classList.add('active');
+  if (map) map.classList.add('active');
+
+  function shimmer(now) {
+    experienceLines.forEach(function(line, index) {
+      if (Math.random() < 0.0945) line.target = 0.55 + Math.random() * 1.05;
+      line.current += (line.target - line.current) * 0.168;
+      var flicker = Math.sin(now * 0.0042 + line.seed + index) * 0.12;
+      line.el.style.filter = 'brightness(' + Math.max(0.45, line.current + flicker).toFixed(2) + ')';
+    });
+    experienceLineFrame = requestAnimationFrame(shimmer);
+  }
+  experienceLineFrame = requestAnimationFrame(shimmer);
+}
+
+
+
+window.ABOUT_SESSION_CONFIG = {
+  stepTwoDelay: 500,
+  textDelay: 1500,
+  exitDelay: 500,
+  scrambleDuration: 3200
+};
+
+function eachAboutTextNode(root, callback) {
+  if (!root) return;
+  var walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, {
+    acceptNode: function(node) {
+      return node.nodeValue.trim() ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
+    }
+  });
+  var nodes = [];
+  while (walker.nextNode()) nodes.push(walker.currentNode);
+  nodes.forEach(callback);
+}
+
+function resetAboutScramble(root) {
+  if (aboutScrambleFrame) cancelAnimationFrame(aboutScrambleFrame);
+  aboutScrambleFrame = null;
+  eachAboutTextNode(root, function(node) {
+    if (node._originalText) node.nodeValue = node._originalText;
+  });
+}
+
+function playAboutScramble(root) {
+  resetAboutScramble(root);
+  if (!root) return;
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/.+-';
+  var nodes = [];
+  eachAboutTextNode(root, function(node) {
+    node._originalText = node._originalText || node.nodeValue;
+    nodes.push({ node: node, text: node._originalText });
+  });
+  var started = performance.now();
+  var duration = (window.ABOUT_SESSION_CONFIG && window.ABOUT_SESSION_CONFIG.scrambleDuration) || 3200;
+
+  function tick(now) {
+    var progress = Math.min((now - started) / duration, 1);
+    nodes.forEach(function(item, index) {
+      var text = item.text;
+      var localProgress = Math.max(0, Math.min((progress - index * 0.025) / 0.92, 1));
+      var reveal = Math.floor(text.length * localProgress);
+      var out = '';
+      for (var i = 0; i < text.length; i++) {
+        var ch = text.charAt(i);
+        if (i < reveal || /\s/.test(ch)) {
+          out += ch;
+        } else {
+          out += chars.charAt(Math.floor(Math.random() * chars.length));
+        }
+      }
+      item.node.nodeValue = out;
+    });
+    if (progress < 1) {
+      aboutScrambleFrame = requestAnimationFrame(tick);
+    } else {
+      nodes.forEach(function(item) { item.node.nodeValue = item.text; });
+      aboutScrambleFrame = null;
+    }
+  }
+
+  aboutScrambleFrame = requestAnimationFrame(tick);
+}
+
+var aboutPixelBlastState = null;
+
+function initAboutPixelBlast() {
+  if (aboutPixelBlastState) return aboutPixelBlastState;
+  var container = document.getElementById('about-pixel-blast');
+  if (!container) return null;
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  if (!ctx) return null;
+  container.appendChild(canvas);
+
+  var frameId = null;
+  var mouse = { x: 0.5, y: 0.5, tx: 0.5, ty: 0.5 };
+  var color = { r: 166, g: 232, b: 238 };
+
+  function resize() {
+    var rect = container.getBoundingClientRect();
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
+    canvas.width = Math.max(1, Math.floor(rect.width * dpr));
+    canvas.height = Math.max(1, Math.floor(rect.height * dpr));
+    canvas.style.width = rect.width + 'px';
+    canvas.style.height = rect.height + 'px';
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  }
+
+  function handleMouseMove(event) {
+    var rect = container.getBoundingClientRect();
+    mouse.tx = (event.clientX - rect.left) / rect.width;
+    mouse.ty = (event.clientY - rect.top) / rect.height;
+  }
+
+  function render(time) {
+    frameId = requestAnimationFrame(render);
+    resize();
+    var w = canvas.clientWidth;
+    var h = canvas.clientHeight;
+    var pixelSize = 4;
+    var patternScale = 3.25;
+    var patternDensity = 1.28;
+    var pixelSizeJitter = 0;
+    var blockSize = 7;
+    var blockIrregularity = 0.65;
+    var blockFadeSpeed = 1.3;
+    var blockContrast = 1.45;
+    var speed = 0.85;
+    var edgeFade = 0.27;
+    var alphaMax = 0.86;
+    var mouseInfluence = 0;
+    var radiusScale = 0.47;
+    mouse.x += 0.06 * (mouse.tx - mouse.x);
+    mouse.y += 0.06 * (mouse.ty - mouse.y);
+    ctx.clearRect(0, 0, w, h);
+
+    var cx = w * 0.5;
+    var cy = h * 0.5;
+    var radius = Math.min(w, h) * radiusScale;
+    var t = time * 0.001 * speed;
+    for (var y = 0; y < h; y += pixelSize) {
+      for (var x = 0; x < w; x += pixelSize) {
+        var nx = (x + pixelSize * 0.5 - cx) / radius;
+        var ny = (y + pixelSize * 0.5 - cy) / radius;
+        var dist = Math.sqrt(nx * nx + ny * ny);
+        if (dist > 1) continue;
+        var angle = Math.atan2(ny, nx);
+        var blockX = x / Math.max(1, pixelSize * blockSize);
+        var blockY = y / Math.max(1, pixelSize * blockSize);
+        var blockNoise = smoothAboutPixelBlockNoise(blockX, blockY, t * blockFadeSpeed);
+        var irregular = aboutPixelHash(Math.floor(blockX), Math.floor(blockY));
+        var grain = Math.sin((x * 0.09 + y * 0.13) * patternScale + irregular * blockIrregularity * 12.0 + t * 0.45);
+        var mouseDx = mouse.x - x / w;
+        var mouseDy = mouse.y - y / h;
+        var mousePush = Math.exp(-(mouseDx * mouseDx + mouseDy * mouseDy) * 18) * mouseInfluence;
+        var blockFade = 0.48 + Math.pow(blockNoise, blockContrast) * 0.52;
+        var density = (grain * 0.5 + 0.5) * patternDensity * blockFade + mousePush * 0.28;
+        var fade = Math.max(0, Math.min(1, (1 - dist) / edgeFade));
+        if (density < 0.72) continue;
+        var jitter = Math.sin((x + y) * 0.21 + t * 5) * pixelSizeJitter;
+        var alpha = Math.min(alphaMax, (density - 0.62) * 0.42) * fade;
+        var size = pixelSize + jitter;
+        ctx.fillStyle = 'rgba(' + color.r + ',' + color.g + ',' + color.b + ',' + alpha.toFixed(3) + ')';
+        ctx.fillRect(x, y, size, size);
+      }
+    }
+  }
+
+  window.addEventListener('mousemove', handleMouseMove);
+  window.addEventListener('resize', resize);
+  aboutPixelBlastState = {
+    start: function() {
+      resize();
+      if (!frameId) frameId = requestAnimationFrame(render);
+    },
+    stop: function() {
+      if (frameId) cancelAnimationFrame(frameId);
+      frameId = null;
+      ctx.clearRect(0, 0, canvas.clientWidth, canvas.clientHeight);
+    }
+  };
+  return aboutPixelBlastState;
+}
+
+function aboutPixelHash(x, y) {
+  var n = Math.sin(x * 127.1 + y * 311.7) * 43758.5453123;
+  return n - Math.floor(n);
+}
+
+function smoothAboutPixelBlockNoise(x, y, t) {
+  var ix = Math.floor(x);
+  var iy = Math.floor(y);
+  var fx = x - ix;
+  var fy = y - iy;
+  var ux = fx * fx * (3 - 2 * fx);
+  var uy = fy * fy * (3 - 2 * fy);
+  var a = aboutPixelHash(ix, iy);
+  var b = aboutPixelHash(ix + 1, iy);
+  var c = aboutPixelHash(ix, iy + 1);
+  var d = aboutPixelHash(ix + 1, iy + 1);
+  var base = (a * (1 - ux) + b * ux) * (1 - uy) + (c * (1 - ux) + d * ux) * uy;
+  return Math.sin((base * 6.283) + t) * 0.5 + 0.5;
+}
+
+function hideAboutFilm(immediate) {
+  if (aboutFilmTimer) clearTimeout(aboutFilmTimer);
+  if (aboutTextTimer) clearTimeout(aboutTextTimer);
+  if (aboutSwingTimer) clearTimeout(aboutSwingTimer);
+  if (aboutExitTimer) clearTimeout(aboutExitTimer);
+  aboutFilmTimer = null;
+  aboutTextTimer = null;
+  aboutSwingTimer = null;
+  aboutExitTimer = null;
+  var xrayFilm = document.getElementById('xray-film-container');
+  var aboutText = document.getElementById('about-text');
+  var aboutPortrait = document.getElementById('about-sam-portrait');
+  var aboutBling = document.getElementById('about-bling-field');
+  var aboutCloseZone = document.getElementById('about-close-zone');
+  var aboutPixelBlast = document.getElementById('about-pixel-blast');
+  samCoverTargetPull = 0;
+  if (aboutPixelBlast) aboutPixelBlast.classList.remove('visible');
+  if (aboutPixelBlastState) aboutPixelBlastState.stop();
+  if (xrayFilm) {
+    xrayFilm.classList.remove('step-two');
+    if (immediate) {
+      xrayFilm.classList.remove('visible', 'settling');
+    } else {
+      aboutExitTimer = setTimeout(function() {
+        xrayFilm.classList.remove('visible', 'settling');
+        aboutExitTimer = null;
+      }, (window.ABOUT_SESSION_CONFIG && window.ABOUT_SESSION_CONFIG.exitDelay) || 500);
+    }
+  }
+  if (aboutPortrait) aboutPortrait.classList.remove('visible');
+  if (aboutBling) aboutBling.classList.remove('visible');
+  if (aboutCloseZone) aboutCloseZone.classList.remove('visible');
+  if (aboutText) {
+    aboutText.classList.remove('visible');
+    resetAboutScramble(aboutText);
+  }
+}
+
+function showAboutFilm() {
+  hideAboutFilm(true);
+  var xrayFilm = document.getElementById('xray-film-container');
+  var aboutText = document.getElementById('about-text');
+  var aboutPortrait = document.getElementById('about-sam-portrait');
+  var aboutBling = document.getElementById('about-bling-field');
+  var aboutCloseZone = document.getElementById('about-close-zone');
+  var aboutPixelBlast = document.getElementById('about-pixel-blast');
+  samCoverTargetPull = 1;
+  if (aboutPixelBlast) {
+    aboutPixelBlast.classList.add('visible');
+    var pixelBlast = initAboutPixelBlast();
+    if (pixelBlast) pixelBlast.start();
+  }
+  if (xrayFilm) {
+    xrayFilm.classList.remove('settling', 'step-two');
+    void xrayFilm.offsetWidth;
+    xrayFilm.classList.add('visible', 'settling');
+  }
+  aboutFilmTimer = setTimeout(function() {
+    if (xrayFilm) {
+      xrayFilm.classList.add('step-two');
+    }
+    if (aboutPortrait) aboutPortrait.classList.add('visible');
+    if (aboutBling) aboutBling.classList.add('visible');
+    if (aboutCloseZone) aboutCloseZone.classList.add('visible');
+  }, (window.ABOUT_SESSION_CONFIG && window.ABOUT_SESSION_CONFIG.exitDelay) || 500);
+  aboutTextTimer = setTimeout(function() {
+    if (aboutText) {
+      aboutText.classList.add('visible');
+      playAboutScramble(aboutText);
+    }
+  }, (window.ABOUT_SESSION_CONFIG && window.ABOUT_SESSION_CONFIG.textDelay) || 1500);
+}
+
+(function bindAboutCloseZone() {
+  var aboutCloseZone = document.getElementById('about-close-zone');
+  var aboutPixelBlast = document.getElementById('about-pixel-blast');
+  var aboutText = document.getElementById('about-text');
+  function goBackToMain(event) {
+    event.stopPropagation();
+    if (typeof closeSession === 'function') closeSession();
+  }
+  if (aboutText && aboutText.dataset.bound !== 'true') {
+    aboutText.dataset.bound = 'true';
+    aboutText.addEventListener('click', function(event) {
+      event.stopPropagation();
+    });
+  }
+  if (!aboutCloseZone || aboutCloseZone.dataset.bound === 'true') return;
+  aboutCloseZone.dataset.bound = 'true';
+  aboutCloseZone.addEventListener('click', goBackToMain);
+  if (aboutPixelBlast && aboutPixelBlast.dataset.bound !== 'true') {
+    aboutPixelBlast.dataset.bound = 'true';
+    aboutPixelBlast.addEventListener('click', goBackToMain);
+  }
+})();
+
+
+
+function openSession(idx) {
+  if (activeSession >= 0) return;
+  activeSession = idx;
+  hideAboutFilm();
+  hideExperienceLines();
+  hideProjectsSession();
+  hideContactSession();
+  hideSkillSession();
+  var planetOverlay = document.getElementById('planet-overlay');
+  var planetImg = document.getElementById('planet-img');
+  if (planetImg) planetImg.src = PLANET_IMAGES[idx];
+  // Phase 1: atom pulls to corner, bars retract
+  var shiftClasses = ['shifted', 'shifted-opt2', 'shifted-opt3', 'shifted-opt4', 'shifted-opt5'];
+  svgEl.classList.add(shiftClasses[idx]);
+  var topBar = document.getElementById('letterbox-top');
+  var bottomBar = document.getElementById('letterbox-bottom');
+  topBar.style.transition = 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+  bottomBar.style.transition = 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+  topBar.style.height = '0%';
+  bottomBar.style.height = '0%';
+  for (var i = 0; i < eState.length; i++) {
+    var l = document.getElementById('el-label-' + i);
+    if (l) l.classList.remove('show');
+    eState[i].frozen = null;
+    eState[i].boost = 4.0;
+  }
+  hoveredIdx = -1;
+  // Phase 2: backdrop fades + planet pulls out after short delay
+  setTimeout(function() {
+    document.getElementById('planet-backdrop').classList.add('active');
+    document.getElementById('planet-overlay').classList.toggle('active', idx !== 3);
+    if (idx === 0) showAboutFilm();
+    if (idx === 2) showSkillSession();
+    if (idx === 3) showProjectsSession();
+    if (idx === 4) showContactSession();
+  }, 200);
+  if (idx === 1) {
+    setTimeout(showExperienceLines, 950);
+  }
+}
+
+function closeSession() {
+  if (activeSession < 0) return;
+  activeSession = -1;
+  hideAboutFilm();
+  hideExperienceLines();
+  hideProjectsSession();
+  hideContactSession();
+  hideSkillSession();
+  // Phase 1: planet retracts first
+  document.getElementById('planet-overlay').classList.remove('active');
+  // Phase 2: backdrop fades + atom moves back
+  setTimeout(function() {
+    document.getElementById('planet-backdrop').classList.remove('active');
+    svgEl.classList.remove('shifted', 'shifted-opt2', 'shifted-opt3', 'shifted-opt4', 'shifted-opt5');
+    var topBar = document.getElementById('letterbox-top');
+    var bottomBar = document.getElementById('letterbox-bottom');
+    topBar.style.transition = 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    bottomBar.style.transition = 'height 0.5s cubic-bezier(0.4, 0, 0.2, 1)';
+    topBar.style.height = '8.5%';
+    bottomBar.style.height = '8.5%';
+    document.getElementById('music-btn').style.bottom = 'calc(8.5% + 12px)';
+  }, 300);
+}
+
+svgEl.addEventListener('click', function() {
+  if (hoveredIdx >= 0 && activeSession < 0) openSession(hoveredIdx);
+});
+
+document.getElementById('planet-backdrop').addEventListener('click', function() {
+  closeSession();
+});
+
+window.addEventListener('message', function(event) {
+  if (!event.data || event.data.type !== 'contact-session-close') return;
+  closeSession();
+});
+
+window.addEventListener('message', function(event) {
+  if (!event.data || event.data.type !== 'project-session-close') return;
+  closeSession();
+});
+
+function focusExperienceMap(index) {
+  var map = document.getElementById('sg-map');
+  var inner = document.getElementById('sg-map-inner');
+  var pin = document.querySelector('.sg-pin[data-map-index="' + index + '"]');
+  if (!map || !inner || !pin) return;
+  var x = parseFloat(pin.style.getPropertyValue('--x'));
+  var y = parseFloat(pin.style.getPropertyValue('--y'));
+  inner.style.setProperty('--map-transform', 'translate3d(' + ((50 - x) * 1.8).toFixed(1) + '%, ' + ((50 - y) * 1.35).toFixed(1) + '%, 120px) rotateX(16deg) rotateZ(-5deg) scale(2.25)');
+  map.classList.add('focused');
+  if (svgEl) svgEl.classList.add('experience-dimmed');
+  document.querySelectorAll('.sg-pin').forEach(function(item) {
+    item.classList.toggle('active', item === pin);
+  });
+}
+
+function resetExperienceMap() {
+  var map = document.getElementById('sg-map');
+  if (map) map.classList.remove('focused');
+  if (svgEl) svgEl.classList.remove('experience-dimmed');
+  document.querySelectorAll('.sg-pin.active').forEach(function(pin) {
+    pin.classList.remove('active');
+  });
+}
+
+document.querySelectorAll('.timeline-item').forEach(function(item) {
+  item.addEventListener('click', function(e) {
+    e.stopPropagation();
+    var button = item.querySelector('.timeline-company');
+    if (!button) return;
+    var willZoom = !item.classList.contains('zoomed');
+    document.querySelectorAll('.timeline-item.zoomed').forEach(function(openItem) {
+      if (openItem !== item) openItem.classList.remove('zoomed');
+    });
+    item.classList.toggle('zoomed', willZoom);
+    if (willZoom) {
+      focusExperienceMap(button.getAttribute('data-map-index'));
+      showExperienceCallout(button);
+    } else {
+      resetExperienceMap();
+      hideExperienceCallout();
+    }
+  });
+});
+
+// ============================================================
+// UPDATE ATOM (orbits + electrons + nucleus)
+// ============================================================
+function updateAtom(time) {
+  if (!nucleusImg) return;
+  var closestDist = Infinity;
+  hoveredIdx = -1;
+  var worldPos = [];
+  var perTrackSpeeds = [params.orbitSpeed1, params.orbitSpeed2, params.orbitSpeed3, params.orbitSpeed4, params.orbitSpeed5];
+  var rxRatios = [1, 0.94, 1.06, 0.97, 1.02];
+  var ryRatios = [1, 1.10, 0.92, 1.04, 0.98];
+
+  for (var i = 0; i < eState.length; i++) {
+    var orbitAngleDeg = ORBIT_BASE_ANGLES[i] + time * perTrackSpeeds[i] * 60;
+    var orbitAngle = orbitAngleDeg * (Math.PI / 180);
+    var perRx = rxRatios.map(function(r) { return params.orbitRx * r; });
+    var perRy = ryRatios.map(function(r) { return params.orbitRy * r; });
+    orbitEls[i].setAttribute('rx', perRx[i]);
+    orbitEls[i].setAttribute('ry', perRy[i]);
+    orbitEls[i].setAttribute('transform', 'rotate(' + (orbitAngleDeg % 360) + ' 300 300)');
+
+    var es = eState[i];
+    if (!es.frozen) {
+      es.phase = (es.phase + params.electronSpeed * 0.03 * (es.boost || 1)) % (Math.PI * 2);
+    }
+    var rx = perRx[i], ry = perRy[i];
+    var ex = 300 + rx * Math.cos(es.phase);
+    var ey = 300 + ry * Math.sin(es.phase);
+    var cosA = Math.cos(orbitAngle), sinA = Math.sin(orbitAngle);
+    var dx = ex - 300, dy = ey - 300;
+    var wx = 300 + dx * cosA - dy * sinA;
+    var wy = 300 + dx * sinA + dy * cosA;
+    if (es.frozen) { wx = es.frozen.x; wy = es.frozen.y; }
+    worldPos[i] = { wx: wx, wy: wy, frozen: !!es.frozen };
+
+    var depth = 0.4 + 0.6 * ((Math.sin(es.phase) + 1) / 2);
+    var d = Math.hypot(mouseSX - wx, mouseSY - wy);
+    var isHovered = d < 35;
+    if (isHovered && d < closestDist) { closestDist = d; hoveredIdx = i; }
+    var label = document.getElementById('el-label-' + i);
+    if (label) {
+      var svgRect = svgEl.getBoundingClientRect();
+      var svgScale = svgRect.width / 600;
+      label.style.left = (svgRect.left + wx * svgScale + 18) + 'px';
+      label.style.top = (svgRect.top + wy * svgScale) + 'px';
+      label.textContent = isHovered ? label.dataset.full : label.dataset.short;
+      label.classList.toggle('show', isHovered);
+    }
+
+    if (hoveredIdx >= 0 && i === hoveredIdx && !es.frozen) {
+      es.frozen = { x: wx, y: wy };
+    } else if (es.frozen && i !== hoveredIdx) {
+      es.frozen = null;
+      var lbl = document.getElementById('el-label-' + i);
+      if (lbl) lbl.classList.remove('show');
+      es.boost = 4.0;
+    }
+
+    var hScale = isHovered ? 1.6 : 1;
+    var g = particleGroups[i];
+    var bloom = g.children[0], mid = g.children[1], core = g.children[2];
+    g.setAttribute('transform', 'translate(' + wx + ', ' + wy + ')');
+    bloom.setAttribute('r', 30 * hScale);
+    bloom.setAttribute('opacity', (isHovered ? 0.16 : 0.08) * depth);
+    mid.setAttribute('r', 10.5 * hScale);
+    mid.setAttribute('opacity', (isHovered ? 0.5 : 0.32) * depth);
+    core.setAttribute('r', 3.2 * hScale);
+    core.setAttribute('opacity', depth);
+  }
+
+  // Collision avoidance - more dynamic interactions
+  for (var i = 0; i < eState.length; i++) {
+    for (var j = i + 1; j < eState.length; j++) {
+      var dist = Math.hypot(worldPos[i].wx - worldPos[j].wx, worldPos[i].wy - worldPos[j].wy);
+      if (dist < 65) {
+        var iFr = worldPos[i].frozen, jFr = worldPos[j].frozen;
+        if (iFr && !jFr) {
+          eState[j].boost = 4.5; eState[i].boost = 0.8;
+        } else if (!iFr && jFr) {
+          eState[i].boost = 4.5; eState[j].boost = 0.8;
+        } else if (iFr && jFr) {
+          var di = Math.hypot(mouseSX - worldPos[i].wx, mouseSY - worldPos[i].wy);
+          var dj = Math.hypot(mouseSX - worldPos[j].wx, mouseSY - worldPos[j].wy);
+          if (di < dj) {
+            eState[j].frozen = null; eState[j].boost = 5.0;
+            var lj = document.getElementById('el-label-' + j);
+            if (lj) lj.classList.remove('show');
+          } else {
+            eState[i].frozen = null; eState[i].boost = 5.0;
+            var li = document.getElementById('el-label-' + i);
+            if (li) li.classList.remove('show');
+          }
+        } else if (!iFr && !jFr) {
+          if (eState[i].phase < eState[j].phase) {
+            eState[i].boost = 3.2; eState[j].boost = 0.35;
+          } else {
+            eState[j].boost = 3.2; eState[i].boost = 0.35;
+          }
+        }
+      }
+    }
+  }
+
+  // Decay boosts
+  for (var i = 0; i < eState.length; i++) {
+    var b = eState[i].boost;
+    if (b !== 1) {
+      eState[i].boost += (1 - b) * 0.12;
+      if (Math.abs(eState[i].boost - 1) < 0.015) eState[i].boost = 1;
+    }
+  }
+
+  // Nucleus glow + image
+  var s = params.nucleusSize;
+  var half = s * 9;
+  nucleusImg.setAttribute('x', 300 - half);
+  nucleusImg.setAttribute('y', 300 - half);
+  nucleusImg.setAttribute('width', s * 18);
+  nucleusImg.setAttribute('height', s * 18);
+  nucleusImg.setAttribute('opacity', params.nucleusOpacity);
+  nucleusImg.setAttribute('filter', 'brightness(' + (1.05 + Math.sin(time * 2.2) * 0.08).toFixed(2) + ')');
+  nucleusGlow2.setAttribute('r', s * 7);
+  nucleusGlow2.setAttribute('opacity', (0.06 + Math.sin(time * 1.4) * 0.02).toFixed(3));
+  nucleusGlow1.setAttribute('r', params.nucleusGlow);
+  nucleusGlow1.setAttribute('opacity', (0.025 + Math.sin(time * 1.4) * 0.008).toFixed(3));
+  nucleusHaze.setAttribute('r', params.nucleusGlow * 1.6);
+  nucleusHaze2.setAttribute('r', params.nucleusGlow * 2.4);
+
+  // Name ring
+  var nameRing = document.getElementById('name-ring');
+  if (nameRing) {
+    var tp = nameRing.querySelector('textPath');
+    if (tp) tp.setAttribute('startOffset', ((time * params.nameRotSpeed) % 100).toFixed(1) + '%');
+  }
+
+  // Cosmic dust
+  var dustEls = document.querySelectorAll('#dust-group circle');
+  var baseCX = [320,275,330,280,310,260,340,290];
+  var baseCY = [280,320,310,270,330,300,295,260];
+  for (var d = 0; d < dustEls.length; d++) {
+    var dc = dustEls[d];
+    dc.setAttribute('cx', baseCX[d] + Math.sin(time * 0.4 + d * 1.3) * 8);
+    dc.setAttribute('cy', baseCY[d] + Math.cos(time * 0.35 + d * 0.9) * 8);
+    dc.setAttribute('opacity', 0.15 + Math.sin(time * 0.7 + d) * 0.1);
+  }
+}
+
+// ============================================================
+// MAIN LOOP
+// ============================================================
+function draw(ts) {
+  try {
+    var t = ts * 0.001;
+    drawStarfield(t);
+    updateAtom(t);
+  } catch(e) {
+    document.getElementById('_err').textContent = 'DRAW: ' + e.message;
+  }
+  requestAnimationFrame(draw);
+}
+requestAnimationFrame(draw);
+
+// ============================================================
+// CONTROLS
+// ============================================================
+var sliderIds = [
+  'reveal-speed','bar-height',
+  'star-count','star-speed','star-opacity','warp-strength','warp-radius',
+  'orbit-rx','orbit-ry','orbit-speed1','orbit-speed2','orbit-speed3','orbit-speed4',
+  'electron-speed','nucleus-size','nucleus-glow','nucleus-opacity',
+  'name-radius','name-size','name-opacity','name-speed'
+];
+
+function mapSlider(id, val) {
+  switch(id) {
+    case 'reveal-speed': params.revealSpeed = val; break;
+    case 'bar-height': params.barHeight = val; break;
+    case 'star-count': params.starCount = val; rebuildStars(); break;
+    case 'star-speed': params.starSpeedMul = val; rebuildStars(); break;
+    case 'star-opacity': params.starOpacityMul = val; rebuildStars(); break;
+    case 'warp-strength': params.warpStrength = val; break;
+    case 'warp-radius': params.warpRadius = val; break;
+    case 'orbit-rx': params.orbitRx = val; break;
+    case 'orbit-ry': params.orbitRy = val; break;
+    case 'orbit-speed1': params.orbitSpeed1 = val; break;
+    case 'orbit-speed2': params.orbitSpeed2 = val; break;
+    case 'orbit-speed3': params.orbitSpeed3 = val; break;
+    case 'orbit-speed4': params.orbitSpeed4 = val; break;
+    case 'electron-speed': params.electronSpeed = val; break;
+    case 'nucleus-size': params.nucleusSize = val; break;
+    case 'nucleus-glow': params.nucleusGlow = val; break;
+    case 'nucleus-opacity': params.nucleusOpacity = val; nucleusImg.setAttribute('opacity', val); break;
+    case 'name-radius': params.nameRingRadius = val; break;
+    case 'name-size': params.nameFontSize = val; break;
+    case 'name-opacity': params.nameOpacity = val; break;
+    case 'name-speed': params.nameRotSpeed = val; break;
+  }
+}
+
+for (var si = 0; si < sliderIds.length; si++) {
+  var sid = sliderIds[si];
+  var el = document.getElementById('ctrl-' + sid);
+  var valEl = document.getElementById('val-' + sid);
+  if (!el) continue;
+  el.addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    var vid = this.id.replace('ctrl-', '');
+    var ve = document.getElementById('val-' + vid);
+    if (ve) ve.textContent = v;
+    mapSlider(vid, v);
+  });
+}
+
+var resetButton = document.getElementById('btn-reset');
+if (resetButton) resetButton.addEventListener('click', function() {
+  var defaults = {
+    'reveal-speed':2,'bar-height':8.5,
+    'star-count':800,'star-speed':1.25,'star-opacity':0.75,'warp-strength':0,'warp-radius':200,
+    'orbit-rx':220,'orbit-ry':92,'orbit-speed1':0.36,'orbit-speed2':0.34,'orbit-speed3':0.38,'orbit-speed4':0.38,
+    'electron-speed':0.1,'nucleus-size':5.5,'nucleus-glow':70,'nucleus-opacity':0.6,
+    'name-radius':95,'name-size':16,'name-opacity':0.45,'name-speed':12
+  };
+  for (var si = 0; si < sliderIds.length; si++) {
+    var sid = sliderIds[si];
+    var el = document.getElementById('ctrl-' + sid);
+    var valEl = document.getElementById('val-' + sid);
+    if (!el) continue;
+    el.value = defaults[sid];
+    valEl.textContent = defaults[sid];
+    mapSlider(sid, defaults[sid]);
+  }
+});
+
+// ============================================================
+// LETTERBOX INTRO
+// ============================================================
+function replayIntro() {
+  var top = document.getElementById('letterbox-top');
+  var bottom = document.getElementById('letterbox-bottom');
+  top.style.transition = 'none';
+  bottom.style.transition = 'none';
+  top.style.height = '50%';
+  bottom.style.height = '50%';
+  requestAnimationFrame(function() {
+    requestAnimationFrame(function() {
+      var dur = params.revealSpeed;
+      top.style.transition = 'height ' + dur + 's cubic-bezier(0.4, 0, 0.2, 1)';
+      bottom.style.transition = 'height ' + dur + 's cubic-bezier(0.4, 0, 0.2, 1)';
+      top.style.height = params.barHeight + '%';
+      bottom.style.height = params.barHeight + '%';
+      document.getElementById('music-btn').style.bottom = 'calc(' + params.barHeight + '% + 12px)';
+    });
+  });
+}
+var replayButton = document.getElementById('btn-replay');
+if (replayButton) replayButton.addEventListener('click', replayIntro);
+setTimeout(replayIntro, 100);
+
+// ============================================================
+// MUSIC
+// ============================================================
+var bgMusic = document.getElementById('bg-music');
+bgMusic.volume = 0.2;
+var musicBtn = document.getElementById('music-btn');
+var musicRing = document.getElementById('music-ring');
+var playing = false;
+
+function animateCircle() {
+  musicRing.classList.remove('ring-animate');
+  void musicRing.offsetWidth;
+  musicRing.classList.add('ring-animate');
+  setTimeout(function() {
+    musicBtn.querySelector('svg').classList.add('svg-blink');
+    setTimeout(function() { musicBtn.querySelector('svg').classList.remove('svg-blink'); }, 200);
+  }, 350);
+}
+
+bgMusic.play().then(function() { playing = true; }).catch(function() { playing = false; });
+
+musicBtn.addEventListener('click', function() {
+  animateCircle();
+  if (playing) {
+    bgMusic.pause();
+    playing = false;
+    document.getElementById('music-icon-play').style.display = '';
+    document.getElementById('music-icon-pause').style.display = 'none';
+  } else {
+    bgMusic.play().then(function() { playing = true; }).catch(function() {});
+    document.getElementById('music-icon-play').style.display = 'none';
+    document.getElementById('music-icon-pause').style.display = '';
+  }
+});
+
+
+// Planet controls
+var planetBackdrop = document.getElementById('planet-backdrop');
+var planetOverlay = document.getElementById('planet-overlay');
+var opacitySlider = document.getElementById('ctrl-planet-opacity');
+var opacityVal = document.getElementById('val-planet-opacity');
+var scaleSlider = document.getElementById('ctrl-planet-scale');
+var scaleVal = document.getElementById('val-planet-scale');
+
+if (opacitySlider && opacityVal) {
+  opacitySlider.addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    opacityVal.textContent = v;
+    if (planetBackdrop) planetBackdrop.style.opacity = v;
+    if (planetOverlay) planetOverlay.style.opacity = v;
+  });
+}
+
+if (scaleSlider && scaleVal) {
+  scaleSlider.addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    scaleVal.textContent = v;
+    if (planetOverlay) planetOverlay.style.transform = 'scale(' + v + ')';
+  });
+}
+
+// About toggle
+var aboutVisibleSlider = document.getElementById('ctrl-about-visible');
+var aboutVisibleVal = document.getElementById('val-about-visible');
+var xrayFilm = document.getElementById('xray-film-container');
+var aboutText = document.getElementById('about-text');
+
+function bindXrayControl(inputId, valueId, target, cssVar, unit) {
+  var input = document.getElementById(inputId);
+  var value = document.getElementById(valueId);
+  if (!input || !value || !target) return;
+  input.addEventListener('input', function() {
+    value.textContent = this.value;
+    target.style.setProperty(cssVar, this.value + unit);
+  });
+}
+
+bindXrayControl('ctrl-xray-size', 'val-xray-size', xrayFilm, '--xray-size', '');
+bindXrayControl('ctrl-xray-shift', 'val-xray-shift', xrayFilm, '--xray-shift', '%');
+bindXrayControl('ctrl-about-width', 'val-about-width', aboutText, '--about-frame-width', '%');
+bindXrayControl('ctrl-about-size', 'val-about-size', aboutText, '--about-font-size', 'rem');
+
+if (aboutVisibleSlider && aboutVisibleVal) {
+  aboutVisibleSlider.addEventListener('input', function() {
+    var v = parseFloat(this.value);
+    aboutVisibleVal.textContent = v;
+    if (xrayFilm && aboutText) {
+      if (v === 1) {
+        xrayFilm.classList.add('visible');
+        aboutText.classList.add('visible');
+      } else {
+        xrayFilm.classList.remove('visible');
+        aboutText.classList.remove('visible');
+      }
+    }
+  });
+}
+
+var controlsToggle = document.getElementById('controls-toggle');
+var controlsPanel = document.getElementById('controls-panel');
+if (controlsToggle && controlsPanel) {
+  controlsToggle.addEventListener('click', function() {
+    controlsPanel.classList.toggle('open');
+  });
+}
+
+}catch(e){document.getElementById('_err').textContent='JS ERROR: '+e.message;console.error(e);}})();
+
+</script>
+</body>
+</html>
+
+

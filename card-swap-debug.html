@@ -1,0 +1,1531 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Card Swap Debug</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #11110f;
+      --panel: #191815;
+      --ink: #f2efe7;
+      --muted: #a8a096;
+      --line: rgba(242, 239, 231, 0.16);
+      --accent: #b8d7e8;
+      --card-w: min(64vw, 740px);
+      --card-h: min(78vh, 400px);
+      --spread: 120px;
+      --lift: 40px;
+      --depth: 102px;
+      --speed: 1100ms;
+      --radius: 22px;
+      --skew: 6deg;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html {
+      background: #07080b;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100dvh;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 18% 20%, rgba(120, 180, 255, 0.18), transparent 30%),
+        linear-gradient(90deg, rgba(7, 8, 11, 0.08), rgba(7, 8, 11, 0.42)),
+        url("bg4.png") center / cover no-repeat #07080b;
+      color: var(--ink);
+      font-family: "Satoshi", "Outfit", "Segoe UI", sans-serif;
+    }
+
+    body.is-embedded .brief,
+    body.is-embedded .controls {
+      display: none;
+    }
+
+    body.is-embedded::after {
+      display: none;
+    }
+
+    .stage {
+      position: relative;
+      min-height: max(100dvh, 501.33px);
+      margin-top: -9px;
+      padding: 10px 44px 0;
+    }
+
+    .brief {
+      width: min(390px, 82vw);
+      display: grid;
+      gap: 18px;
+    }
+
+    .brief,
+    .controls {
+      display: none;
+    }
+
+    .eyebrow {
+      margin: 0;
+      color: var(--accent);
+      font: 700 12px/1.2 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      max-width: 11ch;
+      font-size: clamp(38px, 7vw, 86px);
+      line-height: 0.9;
+      letter-spacing: -0.045em;
+      font-weight: 800;
+    }
+
+    .brief p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.55;
+    }
+
+    .controls {
+      position: fixed;
+      left: 44px;
+      bottom: 36px;
+      width: min(430px, calc(100vw - 88px));
+      display: none;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: rgba(25, 24, 21, 0.72);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08), 0 24px 80px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(18px);
+    }
+
+    label {
+      display: grid;
+      gap: 8px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .control-value {
+      color: var(--ink);
+      font-family: "JetBrains Mono", "Consolas", monospace;
+    }
+
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+    }
+
+    button {
+      border: 1px solid rgba(184, 215, 232, 0.36);
+      border-radius: 10px;
+      background: rgba(184, 215, 232, 0.1);
+      color: var(--ink);
+      font: 700 12px/1 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: transform 180ms ease, background 180ms ease;
+    }
+
+    button:active {
+      transform: translateY(1px) scale(0.99);
+    }
+
+    .card-swap-container {
+      position: absolute;
+      right: clamp(140px, 13vw, 220px);
+      top: 50%;
+      bottom: auto;
+      width: var(--card-w);
+      height: var(--card-h);
+      transform: translateY(-50%);
+      transform-origin: center right;
+      perspective: 900px;
+      overflow: visible;
+    }
+
+    .card {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: var(--card-w);
+      height: var(--card-h);
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      padding: 6px 36px 0;
+      margin: 24px 0 0 98px;
+      border-radius: var(--radius);
+      border: 1px solid rgba(242, 239, 231, 0.34);
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.01)),
+        var(--panel);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), 0 34px 70px rgba(0, 0, 0, 0.36);
+      overflow: hidden;
+      transform-style: preserve-3d;
+      --hover-scale: 1;
+      will-change: transform, opacity;
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+      transition:
+        transform var(--speed) cubic-bezier(0.16, 1, 0.3, 1),
+        opacity var(--speed) cubic-bezier(0.16, 1, 0.3, 1),
+        filter var(--speed) cubic-bezier(0.16, 1, 0.3, 1);
+      cursor: pointer;
+    }
+
+    .card:hover {
+      --hover-scale: 1.035;
+    }
+
+    .card.is-0 {
+      transform: translate3d(-50%, -50%, 0) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 1;
+      filter: saturate(1);
+    }
+
+    .card.is-1 {
+      transform: translate3d(calc(-50% + var(--spread)), calc(-50% - var(--lift)), calc(-1 * var(--depth))) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.86;
+      filter: saturate(1) brightness(1.06);
+    }
+
+    .card.is-2 {
+      transform: translate3d(calc(-50% + var(--spread) * 2), calc(-50% - var(--lift) * 2), calc(-1 * var(--depth) * 2)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.62;
+      filter: saturate(0.92) brightness(1.04);
+    }
+
+    .card.is-3 {
+      transform: translate3d(calc(-50% + var(--spread) * 3), calc(-50% - var(--lift) * 3), calc(-1 * var(--depth) * 3)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.36;
+      filter: saturate(0.8) brightness(1.02);
+    }
+
+    .card.is-4 {
+      transform: translate3d(calc(-50% + var(--spread) * 4), calc(-50% - var(--lift) * 4), calc(-1 * var(--depth) * 4)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.18;
+      filter: saturate(0.68) brightness(1);
+    }
+
+    .card.is-5 {
+      transform: translate3d(calc(-50% + var(--spread) * 5), calc(-50% - var(--lift) * 5), calc(-1 * var(--depth) * 5)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.12;
+      filter: saturate(0.56) brightness(0.98);
+    }
+
+    .card.is-6 {
+      transform: translate3d(calc(-50% + var(--spread) * 6), calc(-50% - var(--lift) * 6), calc(-1 * var(--depth) * 6)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.08;
+      filter: saturate(0.46) brightness(0.96);
+    }
+
+    .card.is-7 {
+      transform: translate3d(calc(-50% + var(--spread) * 7), calc(-50% - var(--lift) * 7), calc(-1 * var(--depth) * 7)) skewY(var(--skew)) scale(var(--hover-scale));
+      opacity: 0.05;
+      filter: saturate(0.38) brightness(0.94);
+    }
+
+    .da-card.is-0 {
+      opacity: 1;
+    }
+
+    .da-card {
+      width: min(64vw, 704px);
+      padding-top: 1px;
+      margin-top: -3px;
+    }
+
+    .window-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .dots {
+      display: flex;
+      gap: 7px;
+    }
+
+    .dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: rgba(242, 239, 231, 0.32);
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: clamp(24px, 4vw, 50px);
+      line-height: 0.94;
+      letter-spacing: -0.045em;
+    }
+
+    .window-body {
+      align-self: stretch;
+      justify-self: stretch;
+      display: grid;
+      gap: 16px;
+      width: 100%;
+      min-height: 0;
+      max-width: none;
+    }
+
+    .da-card .window-body {
+      align-self: stretch;
+      justify-self: stretch;
+      display: block;
+      width: 100%;
+      min-height: 0;
+      max-width: none;
+      overflow: hidden;
+      padding: 12px 0;
+    }
+
+    .window-body p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .da-page {
+      position: relative;
+      width: 100%;
+      min-height: 0;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 18px;
+    }
+
+    .da-kicker {
+      color: var(--accent);
+      font: 700 11px/1.2 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: 0.13em;
+      text-transform: uppercase;
+    }
+
+    .da-hero {
+      position: absolute;
+      left: 0;
+      top: 28px;
+      width: 70%;
+      height: 319.38px;
+      overflow: hidden;
+      border-radius: 18px;
+      background: #171614;
+    }
+
+    .da-hero img,
+    .da-hero video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+      object-position: center;
+      filter: brightness(1.14) saturate(1.06) contrast(1.02);
+    }
+
+    .da-hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(17, 17, 15, 0.28), rgba(17, 17, 15, 0.06) 42%, rgba(17, 17, 15, 0.08)),
+        linear-gradient(180deg, rgba(17, 17, 15, 0), rgba(17, 17, 15, 0.18));
+      pointer-events: none;
+    }
+
+    .da-hero::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 -70px 90px rgba(17, 17, 15, 0.16);
+    }
+
+    .da-image-overlay {
+      position: absolute;
+      right: -10px;
+      top: 29px;
+      z-index: 2;
+      width: 54%;
+      height: 319.38px;
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.16);
+      border-radius: 18px;
+      background: rgba(17, 17, 15, 0.24);
+      box-shadow: 0 22px 60px rgba(0, 0, 0, 0.34);
+    }
+
+    .da-image-overlay img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      margin: 1px 0 0 28px;
+      object-fit: contain;
+      object-position: center;
+      filter: brightness(1.12) saturate(1.08);
+    }
+
+    .da-hero-copy {
+      position: absolute;
+      left: 18px;
+      top: 18px;
+      z-index: 2;
+      width: min(310px, 42%);
+      display: grid;
+      gap: 10px;
+      padding: 14px;
+      border: 1px solid rgba(242, 239, 231, 0.16);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(17, 17, 15, 0.68), rgba(17, 17, 15, 0.3)),
+        rgba(255, 255, 255, 0.035);
+      backdrop-filter: blur(12px);
+    }
+
+    .da-hero-copy h2 {
+      margin: 0;
+      max-width: 8.8ch;
+      font-size: clamp(24px, 3.25vw, 42px);
+      line-height: 0.9;
+      letter-spacing: -0.05em;
+    }
+
+    .da-hero-copy p {
+      max-width: 32ch;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .da-content {
+      position: absolute;
+      right: 16px;
+      bottom: 16px;
+      z-index: 2;
+      width: 100%;
+      max-width: 58%;
+      height: 112px;
+      min-height: 0;
+    }
+
+    .da-panel {
+      display: none;
+    }
+
+    .da-panel h3 {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+
+    .da-panel p {
+      font-size: 12px;
+      line-height: 1.45;
+    }
+
+    .da-points {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      padding: 0;
+      margin: 0;
+      list-style: none;
+    }
+
+    .da-points li {
+      padding: 6px 8px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: rgba(242, 239, 231, 0.82);
+      background: rgba(17, 17, 15, 0.28);
+      font-size: 11px;
+    }
+
+    .da-media-grid {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .da-media {
+      position: relative;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.035);
+      box-shadow: 0 18px 42px rgba(0, 0, 0, 0.28);
+    }
+
+    .da-media img,
+    .da-media video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+    }
+
+    .da-media video {
+      filter: brightness(1.1) saturate(1.05) contrast(1.02);
+    }
+
+    .da-media::after {
+      content: attr(data-label);
+      position: absolute;
+      left: 10px;
+      bottom: 9px;
+      padding: 5px 7px;
+      border: 1px solid rgba(242, 239, 231, 0.16);
+      border-radius: 999px;
+      color: rgba(242, 239, 231, 0.82);
+      background: rgba(17, 17, 15, 0.58);
+      font: 700 10px/1 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      backdrop-filter: blur(10px);
+    }
+
+    .window-grid {
+      display: grid;
+      grid-template-columns: 1.3fr 0.7fr;
+      gap: 10px;
+      margin-top: 8px;
+    }
+
+    .tile {
+      min-height: 76px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: rgba(255, 255, 255, 0.035);
+    }
+
+    .tile:nth-child(1) {
+      grid-row: span 2;
+    }
+
+    .standard-page {
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 16px;
+      padding: 18px 0 12px;
+      overflow: hidden;
+    }
+
+    .standard-page header {
+      display: grid;
+      grid-template-columns: minmax(220px, 0.42fr) minmax(0, 1fr);
+      gap: 28px;
+      align-items: end;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .standard-page h2 {
+      margin: 0;
+      max-width: 10ch;
+    }
+
+    .standard-page p {
+      max-width: 48ch;
+      font-size: 13px;
+    }
+
+    .standard-canvas {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+      gap: 12px;
+    }
+
+    .standard-panel {
+      min-height: 0;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
+        rgba(255, 255, 255, 0.03);
+    }
+
+    .standard-side {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      min-height: 0;
+    }
+
+    .work-card .window-body {
+      display: block;
+      padding: 12px 0;
+      overflow: hidden;
+    }
+
+    .work-page {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      min-height: 0;
+      overflow: hidden;
+      border-radius: calc(var(--radius) - 4px);
+      background:
+        radial-gradient(circle at 70% 22%, rgba(184, 215, 232, 0.16), transparent 22rem),
+        linear-gradient(135deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.018));
+    }
+
+    .work-page::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(17, 17, 15, 0.08), rgba(17, 17, 15, 0.22));
+    }
+
+    .work-title {
+      position: absolute;
+      left: 20px;
+      top: 22px;
+      z-index: 3;
+      max-width: 360px;
+      color: rgba(255, 255, 255, 0.88);
+      font: 650 clamp(42px, 6.6vw, 86px)/0.86 "Satoshi", "Outfit", "Segoe UI", sans-serif;
+      letter-spacing: -0.055em;
+      text-transform: lowercase;
+      text-shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+    }
+
+    .work-shot {
+      position: absolute;
+      overflow: hidden;
+      margin: 0;
+      border: 1px solid rgba(242, 239, 231, 0.2);
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 24px 68px rgba(0, 0, 0, 0.28),
+        0 0 0 7px rgba(255, 255, 255, 0.055),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+    }
+
+    .work-shot embed {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      filter: blur(0.45px) brightness(1.08) saturate(0.9);
+      transform: scale(1.08);
+      transform-origin: center;
+      pointer-events: none;
+    }
+
+    .work-shot.main {
+      right: 22px;
+      top: 54px;
+      width: 58%;
+      height: 68%;
+    }
+
+    .work-shot.small-a {
+      left: 38px;
+      bottom: 28px;
+      width: 34%;
+      height: 36%;
+      transform: rotate(-4deg);
+    }
+
+    .work-shot.small-b {
+      left: 250px;
+      bottom: 44px;
+      width: 30%;
+      height: 32%;
+      transform: rotate(3deg);
+    }
+
+    .work-shot.tall {
+      right: 36px;
+      top: 34px;
+      width: 34%;
+      height: 76%;
+    }
+
+    .work-shot.wide {
+      right: 28px;
+      bottom: 34px;
+      width: 68%;
+      height: 52%;
+    }
+
+    .work-page.frame-mode {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      gap: 12px;
+      padding: 18px;
+    }
+
+    .work-page.frame-mode::after {
+      background: linear-gradient(180deg, rgba(17, 17, 15, 0.04), rgba(17, 17, 15, 0.16));
+    }
+
+    .work-page.frame-mode .work-title {
+      position: relative;
+      left: auto;
+      top: auto;
+      max-width: none;
+      z-index: 2;
+      font-size: clamp(26px, 4vw, 48px);
+      line-height: 0.92;
+      letter-spacing: -0.04em;
+    }
+
+    .frame-shell {
+      position: relative;
+      z-index: 2;
+      min-height: 0;
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.22);
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.025)),
+        rgba(255, 255, 255, 0.04);
+      box-shadow:
+        0 28px 70px rgba(0, 0, 0, 0.26),
+        0 0 0 7px rgba(255, 255, 255, 0.055),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .frame-shell iframe {
+      width: 100%;
+      height: 100%;
+      display: block;
+      border: 0;
+      background: rgba(255, 255, 255, 0.78);
+      filter: brightness(1.05) saturate(0.9);
+    }
+
+    .frame-shell img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+    }
+
+    .card:not(.is-0) .frame-shell iframe {
+      pointer-events: none;
+    }
+
+    .card.is-0 .frame-shell iframe {
+      pointer-events: auto;
+    }
+
+    .frame-single {
+      height: 100%;
+    }
+
+    .frame-triptych {
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr 0.78fr;
+      gap: 12px;
+    }
+
+    .frame-triptych .frame-shell:nth-child(1) {
+      transform: rotate(-1.5deg);
+    }
+
+    .frame-triptych .frame-shell:nth-child(2) {
+      transform: translateY(14px) rotate(1deg);
+    }
+
+    .frame-triptych .frame-shell:nth-child(3) {
+      transform: translateY(-8px) rotate(2deg);
+    }
+
+    .frame-shell.is-tall {
+      width: 52%;
+      margin-left: auto;
+    }
+
+    .single-image-card .work-page.frame-mode {
+      display: block;
+      padding: 0;
+      height: 100%;
+      background: transparent;
+    }
+
+    .single-image-card .work-page.frame-mode::after {
+      background: linear-gradient(180deg, rgba(17, 17, 15, 0.03), rgba(17, 17, 15, 0.14));
+    }
+
+    .full-bleed-image {
+      position: relative;
+      z-index: 2;
+      width: 100%;
+      height: 100%;
+    }
+
+    .full-bleed-image img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      object-position: top center;
+    }
+
+    .qa-manual-card .work-page.frame-mode {
+      display: block;
+      width: 100%;
+      height: calc(100% + 31px);
+      padding: 12px;
+    }
+
+    .qa-marquee-shell {
+      position: relative;
+      height: 100%;
+      overflow: hidden;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 20% 18%, rgba(184, 215, 232, 0.18), transparent 14rem),
+        linear-gradient(160deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.015));
+      isolation: isolate;
+    }
+
+    .qa-marquee-shell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      pointer-events: none;
+      background:
+        linear-gradient(180deg, rgba(17, 17, 15, 0.78), transparent 18%, transparent 82%, rgba(17, 17, 15, 0.78)),
+        linear-gradient(90deg, rgba(17, 17, 15, 0.52), transparent 16%, transparent 84%, rgba(17, 17, 15, 0.52));
+    }
+
+    .qa-marquee-stage {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 164%;
+      aspect-ratio: 1;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      transform: translate(-47%, -48%) rotateX(47deg) rotateZ(39deg) scale(1.02);
+      transform-style: preserve-3d;
+    }
+
+    .qa-marquee-column {
+      display: grid;
+      gap: 12px;
+      align-content: start;
+      will-change: transform;
+      animation: qa-marquee-rise 16s ease-in-out infinite alternate;
+    }
+
+    .qa-marquee-column.reverse {
+      animation-name: qa-marquee-fall;
+      animation-duration: 20s;
+    }
+
+    .qa-marquee-card {
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.2);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.06);
+      box-shadow:
+        0 18px 42px rgba(0, 0, 0, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .qa-marquee-card img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 4 / 3;
+      object-fit: contain;
+      object-position: top center;
+    }
+
+    @keyframes qa-marquee-rise {
+      from {
+        transform: translate3d(0, 48px, 0);
+      }
+      to {
+        transform: translate3d(0, -72px, 0);
+      }
+    }
+
+    @keyframes qa-marquee-fall {
+      from {
+        transform: translate3d(0, -64px, 0);
+      }
+      to {
+        transform: translate3d(0, 54px, 0);
+      }
+    }
+
+    .qa-manual-card .window-foot > span {
+      margin-left: 22px;
+      font-size: 10px;
+      font-weight: 300;
+    }
+
+    .ldct-case-card .work-page.frame-mode {
+      display: block;
+      height: calc(100% + 31px);
+      padding: 12px;
+    }
+
+    .canon-flip-wall {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-rows: repeat(3, minmax(0, 1fr));
+      gap: 8px;
+      height: 100%;
+      perspective: 1200px;
+      align-content: stretch;
+    }
+
+    .canon-flip-tile {
+      position: relative;
+      min-height: 0;
+      transform-style: preserve-3d;
+    }
+
+    .canon-flip-inner {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      border-radius: 16px;
+      transform-style: preserve-3d;
+      transition: transform 900ms cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow:
+        0 20px 46px rgba(0, 0, 0, 0.24),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+    }
+
+    .canon-flip-tile.is-flipped .canon-flip-inner {
+      transform: rotateY(180deg);
+    }
+
+    .canon-flip-face {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.18);
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.05);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+
+    .canon-flip-face.back {
+      transform: rotateY(180deg);
+    }
+
+    .canon-flip-face img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .ldct-case-card .window-foot > span {
+      margin-left: 15px;
+      font-size: 10px;
+      font-weight: 400;
+    }
+
+    .ldct-dose-card .work-page.frame-mode {
+      height: calc(100% + 28px);
+      margin-top: -15px;
+      padding: 0 14px 0;
+    }
+
+    .ldct-dose-card .work-title {
+      margin-top: -18px;
+      height: 13.16px;
+      font-size: 23px;
+      font-weight: 400;
+      line-height: 0.57;
+      text-transform: none;
+    }
+
+    .ldct-dose-card .window-foot > span {
+      margin-left: 18px;
+      font-size: 10px;
+      font-weight: 300;
+    }
+
+    .ct-market-card .work-page.frame-mode {
+      height: calc(100% + 96px);
+      margin-top: -38px;
+    }
+
+    .ct-market-card .work-title {
+      margin-top: -18px;
+      height: 17.16px;
+      font-size: 24px;
+      line-height: 0.67;
+      text-transform: none;
+    }
+
+    .ct-market-card .window-foot > span {
+      margin-left: 18px;
+      font-size: 10px;
+      font-weight: 300;
+    }
+
+    .early-card .window-body {
+      display: block;
+      padding: 12px 0;
+      overflow: visible;
+    }
+
+    .early-card {
+      margin-top: 11px;
+      overflow: visible;
+    }
+
+    .da-card,
+    .early-card {
+      width: var(--card-w);
+      height: var(--card-h);
+      padding-top: 6px;
+      margin: 24px 0 0 98px;
+    }
+
+    .card:has(.type-caption) {
+      overflow: visible;
+    }
+
+    .early-page {
+      position: relative;
+      margin-top: -38px;
+      width: 673.4px;
+      height: 400px;
+      min-height: 0;
+      overflow: visible;
+      border-radius: calc(var(--radius) - 4px);
+    }
+
+    .da-page,
+    .early-page,
+    .card .work-page.frame-mode {
+      margin-top: -38px;
+      height: 400px;
+    }
+
+    .early-bg {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 21px;
+      height: 339.71px;
+      overflow: hidden;
+      border-radius: calc(var(--radius) - 4px);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .early-bg img {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: auto;
+      min-width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+      object-position: center;
+      filter: brightness(1.08) saturate(1.04) contrast(1.01);
+      opacity: 1;
+      max-width: none;
+      animation: early-bg-pan 16s linear infinite alternate;
+    }
+
+    .early-bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(90deg, rgba(17, 17, 15, 0.03), rgba(17, 17, 15, 0.08)),
+        linear-gradient(180deg, rgba(17, 17, 15, 0), rgba(17, 17, 15, 0.04));
+      pointer-events: none;
+    }
+
+    .early-video {
+      position: absolute;
+      right: 24px;
+      bottom: 8px;
+      width: 24%;
+      height: 70%;
+      overflow: hidden;
+      border: 1px solid rgba(242, 239, 231, 0.42);
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      box-shadow:
+        0 26px 70px rgba(0, 0, 0, 0.42),
+        0 0 0 7px rgba(255, 255, 255, 0.09),
+        inset 0 1px 0 rgba(255, 255, 255, 0.18);
+      pointer-events: auto;
+    }
+
+    .early-video video {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      object-position: top center;
+      object-position: center;
+    }
+
+    .early-photos {
+      position: absolute;
+      left: 34px;
+      bottom: -28px;
+      width: 494.57px;
+      height: 289.68px;
+      margin: 0;
+      overflow: visible;
+    }
+
+    .early-photos img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      padding: 0 19px 0 0;
+      margin: 24px 0 0 -52px;
+      opacity: 1;
+      object-fit: contain;
+      object-position: center;
+      filter: brightness(1.08) saturate(1.04) drop-shadow(0 20px 38px rgba(0, 0, 0, 0.28));
+    }
+
+    @keyframes early-bg-pan {
+      from {
+        transform: translateX(0);
+      }
+      to {
+        transform: translateX(calc(var(--card-w) - 100%));
+      }
+    }
+
+    .early-title {
+      position: absolute;
+      left: 72px;
+      top: 62px;
+      color: rgba(255, 255, 255, 0.88);
+      padding: 5px 32px 0 17px;
+      margin: -17px 0 0 3px;
+      font-family: Arial, sans-serif;
+      font-size: clamp(58px, 9vw, 132.38px);
+      line-height: 0.85;
+      letter-spacing: 10px;
+      font-weight: 600;
+      text-transform: lowercase;
+      pointer-events: auto;
+      text-shadow: 0 18px 44px rgba(0, 0, 0, 0.18);
+    }
+
+    .type-caption {
+      position: absolute;
+      left: -392px;
+      top: 114px;
+      width: 480px;
+      z-index: 5;
+      height: 249.75px;
+      min-height: 249.75px;
+      padding: 15.5px 18px 15.5px;
+      margin: -28px 0 0 28px;
+      border-left: 2px solid rgba(255, 255, 255, 0.58);
+      background: #b38d89;
+      color: #ffffff;
+      font: 700 14px/1.45 "Courier New", monospace;
+      opacity: 0.69;
+      letter-spacing: 0.02em;
+      text-shadow: 0 1px 18px rgba(0, 0, 0, 0.42);
+      backdrop-filter: blur(8px);
+      pointer-events: auto;
+    }
+
+    .type-caption::after {
+      content: "";
+      display: inline-block;
+      width: 6px;
+      height: 1em;
+      margin-left: 3px;
+      vertical-align: -2px;
+      background: rgba(246, 251, 255, 0.82);
+      animation: caretBlink 900ms steps(1) infinite;
+    }
+
+    @keyframes caretBlink {
+      50% { opacity: 0; }
+    }
+
+    .window-foot {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 16px;
+      color: var(--muted);
+      font: 700 12px/1.2 "JetBrains Mono", "Consolas", monospace;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .da-card .window-foot {
+      position: absolute;
+      left: 20px;
+      top: 358px;
+      margin-top: -36px;
+      width: 70%;
+      justify-content: flex-start;
+      align-items: center;
+      color: rgba(242, 239, 231, 0.72);
+      text-transform: none;
+    }
+
+    .da-source {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      margin: 45px 0 0 20px;
+      opacity: 0.39;
+      font-size: 11px;
+      letter-spacing: 0.04em;
+    }
+
+    .da-source svg {
+      width: 14px;
+      height: 14px;
+      stroke: currentColor;
+      stroke-width: 1.8;
+      fill: none;
+    }
+
+    .da-card .progress {
+      display: none;
+    }
+
+    .early-card .window-foot span {
+      margin-bottom: 26px;
+    }
+
+    .progress {
+      width: 42%;
+      height: 2px;
+      background: rgba(242, 239, 231, 0.12);
+      overflow: hidden;
+    }
+
+    .progress span {
+      display: block;
+      width: 48%;
+      height: 100%;
+      background: var(--accent);
+    }
+
+    @media (max-width: 768px) {
+      body {
+        overflow: auto;
+      }
+
+      .stage {
+        min-height: 100dvh;
+        padding: 24px;
+      }
+
+      .card-swap-container {
+        position: relative;
+        right: auto;
+        bottom: auto;
+        width: min(92vw, 520px);
+        height: 410px;
+        margin: 56px 0 210px auto;
+        transform: scale(0.75) translate(25%, 25%);
+      }
+
+      .controls {
+        left: 24px;
+        bottom: 24px;
+        width: calc(100vw - 48px);
+      }
+
+      .da-card .window-body {
+        padding: 10px 0;
+      }
+
+      .da-page,
+      .da-content {
+        grid-template-columns: 1fr;
+      }
+
+      .da-page {
+        grid-template-rows: auto minmax(180px, 1fr) 160px;
+      }
+
+      .da-hero-copy,
+      .da-hero,
+      .da-media-grid {
+        grid-column: 1;
+        grid-row: auto;
+      }
+
+      .da-media-grid {
+        min-height: 180px;
+      }
+
+      .standard-page header,
+      .standard-canvas {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .controls {
+        grid-template-columns: 1fr;
+      }
+
+      .card-swap-container {
+        transform: scale(0.55) translate(25%, 25%);
+        margin-bottom: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage">
+    <section class="brief" aria-label="Effect debug notes">
+      <p class="eyebrow">Effect Lab / Card Swap</p>
+      <h1>Five window stack.</h1>
+      <p>Standalone tuning page for the session window transition. Hover to preview a window; click any window to bring it forward.</p>
+    </section>
+
+    <section class="card-swap-container" aria-label="Five card swap windows">
+      <article class="card early-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>01</span></div>
+        <div class="window-body">
+          <div class="early-page">
+            <div class="early-bg"><img src="da/site.png" alt="Early DA Medsuites site background"></div>
+            <div class="early-title" aria-label="early title">early</div>
+            <figure class="early-photos"><img src="da/early_photos.png" alt="Early DA Medsuites photo collage"></figure>
+            <div class="early-video" aria-label="early video frame"><video src="da/early.mp4" muted autoplay loop playsinline preload="metadata"></video></div>
+          </div>
+        </div>
+        <p class="type-caption" data-type-text="Joined Early Medical Centre - Singapore-based preventive healthcare clinic focused on a transparent, calming patient experience - during its startup phase to independently establish its diagnostic imaging department. Directed the end-to-end launch of comprehensive radiology services (CT, X-ray, Mammogram, Ultrasound), overseeing facility planning, radiological licensing, QA manual development, hardware/software integration, and workflow design for full operational launch."></p>
+        <div class="window-foot"><span>Early / Site</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card da-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>02</span></div>
+        <div class="window-body">
+          <div class="da-page">
+            <section class="da-hero">
+              <video src="da/Screen_Recording_20240312_215836_Instagram.mp4" muted autoplay loop playsinline preload="metadata"></video>
+            </section>
+            <figure class="da-image-overlay"><img src="da_pic.png" alt="DA Medsuites Orchard overlay image"></figure>
+          </div>
+        </div>
+        <p class="type-caption" data-type-text="Joined DA MedSuites - a premium 12,000 sq ft integrated medical facility by Doctor Anywhere - during its startup phase to establish its flagship diagnostic imaging center. Directed the end-to-end launch of comprehensive radiology services (MRI, CT, X-ray, Ultrasound, Mammography), managing the radiological license application, writing the complete CT QA manual, leading hardware/software integration, and designing workflows for operational readiness."></p>
+        <div class="window-foot"><span class="da-source">video source <svg viewBox="0 0 24 24" aria-label="Instagram outline icon"><rect x="4" y="4" width="16" height="16" rx="5"></rect><circle cx="12" cy="12" r="3.4"></circle><circle cx="17.2" cy="6.8" r="0.8"></circle></svg>@da.medsuites</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card coros-card single-image-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>03</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="full-bleed-image"><img src="Showcase_coros.png" alt="Coros showcase"></div></div></div>
+        <p class="type-caption" data-type-text="Authored the complete operational and clinical manual for CT Coronary Angiography (COROS), standardizing patient preparation workflows, scan protocols (steps from receiving appointment calls to complete post-processing results and pre-post patient monitoring."></p>
+        <div class="window-foot"><span>Coros / Decks</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card qa-manual-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>04</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="canon-flip-wall"><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/05.png" alt="QA showcase 5"></div><div class="canon-flip-face back"><img src="qa/09.png" alt="QA showcase 9"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/10.png" alt="QA showcase 10"></div><div class="canon-flip-face back"><img src="qa/11.png" alt="QA showcase 11"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/12.png" alt="QA showcase 12"></div><div class="canon-flip-face back"><img src="qa/13.png" alt="QA showcase 13"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/14.png" alt="QA showcase 14"></div><div class="canon-flip-face back"><img src="qa/15.png" alt="QA showcase 15"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/16.png" alt="QA showcase 16"></div><div class="canon-flip-face back"><img src="qa/17.png" alt="QA showcase 17"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/18.png" alt="QA showcase 18"></div><div class="canon-flip-face back"><img src="qa/19.png" alt="QA showcase 19"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/20.png" alt="QA showcase 20"></div><div class="canon-flip-face back"><img src="qa/21.png" alt="QA showcase 21"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/09.png" alt="QA showcase 9 repeat"></div><div class="canon-flip-face back"><img src="qa/12.png" alt="QA showcase 12 repeat"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="qa/15.png" alt="QA showcase 15 repeat"></div><div class="canon-flip-face back"><img src="qa/18.png" alt="QA showcase 18 repeat"></div></div></div></div></div></div>
+        <div class="window-foot"><span>QA / Manual</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card single-image-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>05</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="full-bleed-image"><img src="Showcase_dose_optimization.png" alt="Dose optimization showcase"></div></div></div>
+        <p class="type-caption" data-type-text="CT radiation dose optimization project for URO-series scans to ensure HCSA compliance, designing and validating new protocols that successfully reduced patient exposure when evaluated against UKHSA benchmarks."></p>
+        <div class="window-foot"><span>URO / Dose</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card ldct-case-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>06</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="canon-flip-wall"><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/01.png" alt="Canon case showcase 1"></div><div class="canon-flip-face back"><img src="canon/02.png" alt="Canon case showcase 2"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/03.png" alt="Canon case showcase 3"></div><div class="canon-flip-face back"><img src="canon/04.png" alt="Canon case showcase 4"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/05.png" alt="Canon case showcase 5"></div><div class="canon-flip-face back"><img src="canon/06.png" alt="Canon case showcase 6"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/07.png" alt="Canon case showcase 7"></div><div class="canon-flip-face back"><img src="canon/01.png" alt="Canon case showcase 1 repeat"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/02.png" alt="Canon case showcase 2 repeat"></div><div class="canon-flip-face back"><img src="canon/03.png" alt="Canon case showcase 3 repeat"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/04.png" alt="Canon case showcase 4 repeat"></div><div class="canon-flip-face back"><img src="canon/05.png" alt="Canon case showcase 5 repeat"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/06.png" alt="Canon case showcase 6 repeat"></div><div class="canon-flip-face back"><img src="canon/07.png" alt="Canon case showcase 7 repeat"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/01.png" alt="Canon case showcase 1 alternate"></div><div class="canon-flip-face back"><img src="canon/04.png" alt="Canon case showcase 4 alternate"></div></div></div><div class="canon-flip-tile"><div class="canon-flip-inner"><div class="canon-flip-face front"><img src="canon/05.png" alt="Canon case showcase 5 alternate"></div><div class="canon-flip-face back"><img src="canon/02.png" alt="Canon case showcase 2 alternate"></div></div></div></div></div></div>
+        <p class="type-caption" data-type-text="Canon CT LDCT integration research evaluating AiCE deep learning reconstruction and Silver Beam filtration to optimize lung cancer screening workflows and achieve ultra-low radiation doses."></p>
+        <div class="window-foot"><span>LDCT - Canon</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card single-image-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>07</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="full-bleed-image"><img src="Showcase_ldct.png" alt="LDCT showcase"></div></div></div>
+        <p class="type-caption" data-type-text="Developed educational materials on LDCT dosage equivalence, simplifying complex radiation metrics by comparing medical imaging exposures to natural background radiation to support ALARA principles and patient counseling."></p>
+        <div class="window-foot"><span>CT - G.E</span><div class="progress"><span></span></div></div>
+      </article>
+      <article class="card work-card single-image-card" data-window>
+        <div class="window-top"><div class="dots"><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span>08</span></div>
+        <div class="window-body"><div class="work-page frame-mode"><div class="full-bleed-image"><img src="Showcase_market.png" alt="CT market showcase"></div></div></div>
+        <p class="type-caption" data-type-text="Analyzed regional CT imaging market dynamics, identifying gaps in competitor offerings (e.g., COROS hardware limitations, Urogram dosing) to develop operational strategies that improved scan efficiency, safety protocols, and diagnostic quality."></p>
+        <div class="window-foot"><span>CT / Singapore</span><div class="progress"><span></span></div></div>
+      </article>
+    </section>
+
+    <form class="controls" aria-label="Effect tuning controls">
+      <label>Motion <span class="control-value" id="speedValue">1100ms</span><input id="speed" type="range" min="180" max="1100" step="20" value="1100"></label>
+      <label>Spread <span class="control-value" id="spreadValue">120px</span><input id="spread" type="range" min="34" max="120" step="2" value="120"></label>
+      <label>Lift <span class="control-value" id="liftValue">40px</span><input id="lift" type="range" min="18" max="90" step="2" value="40"></label>
+      <label>Depth <span class="control-value" id="depthValue">102px</span><input id="depth" type="range" min="20" max="150" step="2" value="102"></label>
+      <button type="button" id="next">Next Window</button>
+      <button type="button" id="reset">Reset Front</button>
+    </form>
+  </main>
+
+  <script>
+    if (window.self !== window.top) document.body.classList.add("is-embedded");
+
+    const root = document.documentElement;
+    const cards = Array.from(document.querySelectorAll("[data-window]"));
+    const baseClasses = new Map(cards.map((card) => [card, card.className.replace(/\bis-\d\b/g, "").trim()]));
+    const controls = [
+      ["speed", "--speed", "ms"],
+      ["spread", "--spread", "px"],
+      ["lift", "--lift", "px"],
+      ["depth", "--depth", "px"]
+    ];
+    let active = 0;
+    let animating = false;
+    let typeTimer = 0;
+    let typedCaption = null;
+
+    function typeActiveCaption() {
+      window.clearTimeout(typeTimer);
+      const caption = cards[active].querySelector("[data-type-text]");
+      if (typedCaption && typedCaption !== caption) typedCaption.textContent = "";
+      typedCaption = caption;
+      if (!caption) return;
+
+      const text = caption.dataset.typeText || "";
+      caption.textContent = "";
+      let index = 0;
+
+      function tick() {
+        caption.textContent = text.slice(0, index);
+        index += 1;
+        if (index <= text.length) {
+          typeTimer = window.setTimeout(tick, 10);
+        }
+      }
+
+      tick();
+    }
+
+    function render() {
+      cards.forEach((card, index) => {
+        const slot = (index - active + cards.length) % cards.length;
+        card.className = `${baseClasses.get(card)} is-${slot}`;
+        card.style.zIndex = String(cards.length - slot);
+      });
+      typeActiveCaption();
+    }
+
+    function wait(ms) {
+      return new Promise((resolve) => window.setTimeout(resolve, ms));
+    }
+
+    async function swapTo(nextActive) {
+      if (animating || nextActive === active) return;
+      animating = true;
+
+      const currentFront = cards[active];
+      const speed = Number(document.getElementById("speed").value);
+      currentFront.style.transitionDuration = `${Math.max(420, speed * 0.72)}ms`;
+      currentFront.style.transform = `${getComputedStyle(currentFront).transform} translateY(500px)`;
+      currentFront.style.opacity = "0.08";
+
+      await wait(Math.max(260, speed * 0.38));
+      active = nextActive;
+      render();
+
+      await wait(Math.max(420, speed * 0.62));
+      currentFront.style.transitionDuration = "";
+      currentFront.style.transform = "";
+      currentFront.style.opacity = "";
+      animating = false;
+    }
+
+    function nextCard() {
+      swapTo((active + 1) % cards.length);
+    }
+
+    controls.forEach(([id, property, unit]) => {
+      const input = document.getElementById(id);
+      const output = document.getElementById(`${id}Value`);
+      input.addEventListener("input", () => {
+        root.style.setProperty(property, `${input.value}${unit}`);
+        output.textContent = `${input.value}${unit}`;
+      });
+    });
+
+    cards.forEach((card, index) => {
+      card.addEventListener("click", () => {
+        swapTo(index);
+      });
+    });
+
+    document.querySelector(".stage").addEventListener("click", (event) => {
+      if (event.target.closest(".card-swap-container, .controls, .brief, .type-caption")) return;
+      window.parent.postMessage({ type: "project-session-close" }, "*");
+    });
+
+    document.getElementById("next").addEventListener("click", nextCard);
+    document.getElementById("reset").addEventListener("click", () => {
+      swapTo(0);
+    });
+
+    const canonFlipTimers = [];
+
+    function scheduleCanonFlip(tile, delay) {
+      const timer = window.setTimeout(() => {
+        tile.classList.toggle("is-flipped");
+        scheduleCanonFlip(tile, 1400 + Math.random() * 2800);
+      }, delay);
+      canonFlipTimers.push(timer);
+    }
+
+    function initCanonFlipWall() {
+      const tiles = Array.from(document.querySelectorAll(".canon-flip-tile"));
+      tiles.forEach((tile, index) => {
+        const initialDelay = 500 + index * 180 + Math.random() * 900;
+        scheduleCanonFlip(tile, initialDelay);
+      });
+    }
+
+    render();
+    initCanonFlipWall();
+  </script>
+</body>
+</html>
+
+
+
